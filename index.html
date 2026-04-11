@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Monitoring Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 24px;
+            }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            .header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 24px;
+                padding: 20px;
+            }
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            font-size: 20px;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            color: #ffffff;
+        }
+
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 24px;
+            }
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        @media (min-width: 768px) {
+            .subtitle {
+                font-size: 14px;
+            }
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(34, 197, 94, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #22c55e;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 14px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            flex: 1;
+            position: relative;
+        }
+
+        @media (min-width: 640px) {
+            .tab {
+                padding: 12px 24px;
+                font-size: 16px;
+                flex: initial;
+            }
+        }
+
+        .tab:hover {
+            color: #f1f5f9;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab.active {
+            color: #ffffff;
+            background: rgba(59, 130, 246, 0.2);
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .grid {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+        }
+
+        .grid-4 {
+            grid-template-columns: 1fr;
+        }
+
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 640px) {
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .grid-4 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transform: translateZ(0);
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px) translateZ(0);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .sensor-icon {
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 20px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-green {
+            background-color: #22c55e;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+        }
+        .status-amber {
+            background-color: #f59e0b;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+        }
+        .status-red {
+            background-color: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+        }
+
+        .sensor-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .sensor-value {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .value-large {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        @media (min-width: 640px) {
+            .value-large {
+                font-size: 36px;
+            }
+        }
+
+        .value-unit {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .color-green { color: #22c55e; }
+        .color-amber { color: #f59e0b; }
+        .color-red { color: #ef4444; }
+
+        .secondary-values {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .secondary-value label {
+            font-size: 11px;
+            color: #94a3b8;
+            display: block;
+            font-weight: 600;
+        }
+
+        .secondary-value span {
+            font-size: 14px;
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .section-header {
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+        }
+
+        .section-header h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .event-log {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .event-log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .event-log::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .event-log::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .event-item {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+
+        .event-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .event-item:last-child {
+            border-bottom: none;
+        }
+
+        .event-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .event-content {
+            flex: 1;
+        }
+
+        .event-message {
+            font-size: 14px;
+            color: #f1f5f9;
+        }
+
+        .event-sensor {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .event-time {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .chart-wrapper {
+            margin-top: 16px;
+        }
+
+        canvas {
+            max-width: 100%;
+            will-change: auto;
+        }
+
+        .card canvas {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            width: 100%;
+            min-height: 44px;
+        }
+
+        @media (min-width: 640px) {
+            .download-btn {
+                width: auto;
+                padding: 10px 20px;
+                font-size: 14px;
+                gap: 8px;
+            }
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .record-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s;
+            width: 100%;
+            min-height: 44px;
+        }
+
+        @media (min-width: 640px) {
+            .record-btn {
+                width: auto;
+                padding: 10px 20px;
+                font-size: 14px;
+                gap: 8px;
+            }
+        }
+
+        .record-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .record-btn.recording {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-color: #ef4444;
+            animation: recordPulse 1.5s infinite;
+        }
+
+        @keyframes recordPulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(239, 68, 68, 0.8);
+            }
+        }
+
+        .record-btn:active {
+            transform: translateY(0);
+        }
+
+        .time-select {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+            width: 100%;
+            min-height: 44px;
+        }
+
+        @media (min-width: 640px) {
+            .time-select {
+                width: auto;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+        }
+
+        .time-select:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .time-select option {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+
+        .date-inputs {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .date-inputs.show {
+            display: flex;
+        }
+
+        @media (min-width: 640px) {
+            .date-inputs {
+                flex-direction: row;
+                align-items: center;
+                width: auto;
+            }
+        }
+
+        .date-input {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .date-input {
+                width: auto;
+            }
+        }
+
+        .date-input:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .controls-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .controls-wrapper {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                width: auto;
+                gap: 16px;
+            }
+
+            .date-separator {
+                display: inline !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="icon-box">📡</div>
+                <div>
+                    <h1>Environmental Monitoring</h1>
+                    <p class="subtitle">Live sensor data • Updated <span id="timestamp">--:--:--</span></p>
+                </div>
+            </div>
+            <div class="controls-wrapper">
+                <select id="timeRange" class="time-select" onchange="toggleDateInputs()">
+                    <option value="all">All Time</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="custom">Custom Date Range</option>
+                </select>
+                <div id="dateInputs" class="date-inputs">
+                    <input type="date" id="startDate" class="date-input" placeholder="Start Date">
+                    <span style="color: #94a3b8; display: none;" class="date-separator">to</span>
+                    <input type="date" id="endDate" class="date-input" placeholder="End Date">
+                </div>
+                <button class="download-btn" onclick="downloadCSV()">
+                    📥 Download CSV
+                </button>
+                <button id="recordBtn" class="record-btn" onclick="toggleRecording()">
+                    <span id="recordIcon">🎤</span>
+                    <span id="recordText">Record Audio</span>
+                </button>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    <span class="subtitle">Streaming</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchNode(1)">Node 1</button>
+            <button class="tab" onclick="switchNode(2)">Node 2</button>
+        </div>
+
+        <!-- ThingSpeak Info -->
+        <div id="thingspeakInfo" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div>
+                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: #3b82f6; font-size: 13px;">
+                    <span>🔗</span>
+                    <strong>Live Data (Node 1 Only)</strong>
+                </div>
+                <div style="color: #94a3b8; font-size: 11px; margin-top: 4px; line-height: 1.4;">
+                    Field Mapping: field1=Temperature, field2=Humidity, field3=Noise Peak, field4=Noise, field5=Light, field6=PM2.5, field7=PM10, field8=NH3 • Node 2 uses simulated data
+                </div>
+            </div>
+            <button onclick="updateSensors()" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4); padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; width: 100%;">
+                🔄 Refresh
+            </button>
+        </div>
+
+        <style>
+        @media (min-width: 640px) {
+            #thingspeakInfo {
+                flex-direction: row !important;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px !important;
+                margin-bottom: 24px !important;
+            }
+
+            #thingspeakInfo > div:first-child > div:first-child {
+                font-size: 14px !important;
+                gap: 8px !important;
+            }
+
+            #thingspeakInfo > div:first-child > div:last-child {
+                font-size: 12px !important;
+            }
+
+            #thingspeakInfo button {
+                width: auto !important;
+            }
+        }
+        </style>
+
+        <!-- Primary Sensors -->
+        <div class="grid grid-4" id="primary-sensors"></div>
+
+        <!-- TVOC Sensors -->
+        <div style="margin-bottom: 24px;">
+            <div class="section-header">
+                <h3>🌬️ Total Volatile Organic Compounds</h3>
+            </div>
+            <div class="grid grid-4" id="tvoc-sensors"></div>
+        </div>
+
+        <!-- Particulate Matter -->
+        <div style="margin-bottom: 24px;">
+            <div class="section-header">
+                <h3>⚠️ Particulate Matter</h3>
+            </div>
+            <div class="grid grid-2" id="pm-sensors"></div>
+        </div>
+
+        <!-- Charts -->
+        <div style="margin-bottom: 24px;">
+            <div class="section-header">
+                <h3>📈 Trend Analysis</h3>
+            </div>
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="sensor-label">Climate</p>
+                    </div>
+                    <div style="height: 120px;">
+                        <canvas id="climateChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <p class="sensor-label">Air Quality</p>
+                    </div>
+                    <div style="height: 120px;">
+                        <canvas id="airChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Log -->
+        <div>
+            <div class="section-header">
+                <h3>📜 Event Log (<span id="event-count">0</span> events)</h3>
+            </div>
+            <div class="event-log" id="event-log"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentNode = 1;
+        let chartData = { climate: [], air: [] };
+        let events = [];
+        let climateChart, airChart;
+        let sensorHistory = []; // Store all sensor readings with timestamps
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let isLiveData = false;
+
+        // ThingSpeak Configuration
+        const THINGSPEAK_CHANNEL_ID = '3187445';
+        const THINGSPEAK_READ_API_KEY = ''; // Add if channel is private
+        const THINGSPEAK_API_URL = `https://api.thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/feeds.json`;
+
+        // Field mapping for ThingSpeak
+        // field1 = Temperature (°C)
+        // field2 = Humidity (%)
+        // field3 = Noise Peak (dB)
+        // field4 = Noise Current (dB)
+        // field5 = Light Intensity (lux)
+        // field6 = PM 2.5 (μg/m³)
+        // field7 = PM 10 (μg/m³)
+        // field8 = NH3 (ppb)
+
+        // Initialize charts
+        function initCharts() {
+            const chartConfig = {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    transitions: {
+                        active: {
+                            animation: {
+                                duration: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8', font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#64748b', font: { size: 10 } },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            ticks: { color: '#64748b', font: { size: 10 } },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderWidth: 2
+                        },
+                        point: {
+                            radius: 0,
+                            hitRadius: 0,
+                            hoverRadius: 0
+                        }
+                    }
+                }
+            };
+
+            climateChart = new Chart(document.getElementById('climateChart'), {
+                ...chartConfig,
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Temperature (°C)',
+                            data: [],
+                            borderColor: '#f97316',
+                            backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                            tension: 0.2,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Humidity (%)',
+                            data: [],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.2,
+                            borderWidth: 2
+                        }
+                    ]
+                }
+            });
+
+            airChart = new Chart(document.getElementById('airChart'), {
+                ...chartConfig,
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'PM 2.5 (μg/m³)',
+                            data: [],
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            tension: 0.2,
+                            borderWidth: 2
+                        }
+                    ]
+                }
+            });
+        }
+
+        // Fetch data from ThingSpeak (Node 1 only)
+        async function fetchThingSpeakData() {
+            try {
+                const url = `${THINGSPEAK_API_URL}?results=1`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.feeds && data.feeds.length > 0) {
+                    const feed = data.feeds[0];
+                    isLiveData = true;
+
+                    // Only update status if we're on Node 1
+                    if (currentNode === 1) {
+                        updateConnectionStatus(true);
+                    }
+
+                    return {
+                        temperature: parseFloat(feed.field1) || 22.5,
+                        humidity: parseFloat(feed.field2) || 50.0,
+                        lightIntensity: parseFloat(feed.field5) || 500,
+                        noise: {
+                            current: parseFloat(feed.field4) || 45.0,
+                            peak: parseFloat(feed.field3) || 70.0,
+                            average: parseFloat(feed.field3) || 55.0
+                        },
+                        tvoc: {
+                            nh3: parseFloat(feed.field8) || 10.0,
+                            no2: 5.0,
+                            h2s: 3.0,
+                            co: 20.0
+                        },
+                        particulate: {
+                            pm25: parseFloat(feed.field6) || 15.0,
+                            pm10: parseFloat(feed.field7) || 25.0
+                        }
+                    };
+                } else {
+                    throw new Error('No feed data available');
+                }
+            } catch (error) {
+                console.error('Error fetching ThingSpeak data:', error);
+                isLiveData = false;
+
+                // Only update status if we're on Node 1
+                if (currentNode === 1) {
+                    updateConnectionStatus(false);
+                }
+
+                // Return fallback mock data if API fails
+                return generateMockSensorData(1);
+            }
+        }
+
+        // Update connection status indicator
+        function updateConnectionStatus(connected, nodeLabel = '') {
+            const statusDot = document.querySelector('.status-dot');
+            const statusText = document.querySelector('.status .subtitle');
+
+            if (connected) {
+                statusDot.style.backgroundColor = '#22c55e';
+                statusText.textContent = 'Live Data';
+            } else {
+                if (nodeLabel === 'Node 2') {
+                    statusDot.style.backgroundColor = '#8b5cf6';
+                    statusText.textContent = 'Simulated';
+                } else {
+                    statusDot.style.backgroundColor = '#f59e0b';
+                    statusText.textContent = 'Connection Error';
+                }
+            }
+        }
+
+        // Generate mock sensor data (fallback)
+        function generateMockSensorData(nodeId) {
+            const offset = nodeId === 1 ? 0 : 3;
+            return {
+                temperature: 20 + offset + Math.random() * 8,
+                humidity: 40 + offset * 2 + Math.random() * 20,
+                lightIntensity: 200 + offset * 50 + Math.random() * 800,
+                noise: {
+                    current: 40 + offset * 3 + Math.random() * 40,
+                    peak: 60 + offset * 2 + Math.random() * 30,
+                    average: 45 + offset * 2 + Math.random() * 20
+                },
+                tvoc: {
+                    nh3: offset * 5 + Math.random() * 50,
+                    no2: offset * 3 + Math.random() * 30,
+                    h2s: offset * 2 + Math.random() * 20,
+                    co: offset * 10 + Math.random() * 100
+                },
+                particulate: {
+                    pm25: offset * 4 + Math.random() * 35,
+                    pm10: offset * 5 + Math.random() * 50
+                }
+            };
+        }
+
+        // Get status
+        function getStatus(value, warning, critical, inverse = false) {
+            if (inverse) {
+                if (value < critical) return 'red';
+                if (value < warning) return 'amber';
+                return 'green';
+            }
+            if (value > critical) return 'red';
+            if (value > warning) return 'amber';
+            return 'green';
+        }
+
+        // Update sensors
+        async function updateSensors() {
+            let data;
+
+            // Use ThingSpeak data for Node 1, mock data for Node 2
+            if (currentNode === 1) {
+                data = await fetchThingSpeakData();
+            } else {
+                data = generateMockSensorData(currentNode);
+                updateConnectionStatus(false, 'Node 2');
+            }
+
+            const timestamp = new Date();
+
+            // Store in history
+            sensorHistory.push({
+                timestamp: timestamp,
+                node: currentNode,
+                data: data
+            });
+
+            // Primary sensors
+            const primarySensors = [
+                { icon: '🌡️', label: 'Temperature', value: data.temperature.toFixed(1), unit: '°C',
+                  status: getStatus(data.temperature, 26, 30) },
+                { icon: '💧', label: 'Humidity', value: data.humidity.toFixed(1), unit: '%',
+                  status: getStatus(data.humidity, 55, 65) },
+                { icon: '☀️', label: 'Light Intensity', value: Math.round(data.lightIntensity), unit: 'lux',
+                  status: getStatus(data.lightIntensity, 300, 200, true) },
+                { icon: '🔊', label: 'Noise Level', value: data.noise.current.toFixed(1), unit: 'dB',
+                  status: getStatus(data.noise.current, 70, 85),
+                  secondary: [
+                    { label: 'Peak', value: data.noise.peak.toFixed(1) },
+                    { label: 'Avg', value: data.noise.average.toFixed(1) }
+                  ]
+                }
+            ];
+
+            document.getElementById('primary-sensors').innerHTML = primarySensors.map(s => `
+                <div class="card">
+                    <div class="card-header">
+                        <div class="sensor-icon">${s.icon}</div>
+                        <div class="status-indicator status-${s.status}"></div>
+                    </div>
+                    <p class="sensor-label">${s.label}</p>
+                    <div class="sensor-value">
+                        <span class="value-large color-${s.status}">${s.value}</span>
+                        <span class="value-unit">${s.unit}</span>
+                    </div>
+                    ${s.secondary ? `
+                        <div class="secondary-values">
+                            ${s.secondary.map(sec => `
+                                <div class="secondary-value">
+                                    <label>${sec.label}</label>
+                                    <span>${sec.value} dB</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+
+            // TVOC sensors
+            const tvocSensors = [
+                { label: 'NH₃', value: data.tvoc.nh3, warning: 35, critical: 45, unit: 'ppb' },
+                { label: 'NO₂', value: data.tvoc.no2, warning: 20, critical: 25, unit: 'ppb' },
+                { label: 'H₂S', value: data.tvoc.h2s, warning: 15, critical: 18, unit: 'ppb' },
+                { label: 'CO', value: data.tvoc.co, warning: 70, critical: 90, unit: 'ppm' }
+            ];
+
+            document.getElementById('tvoc-sensors').innerHTML = tvocSensors.map(s => {
+                const status = getStatus(s.value, s.warning, s.critical);
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <p class="sensor-label">${s.label}</p>
+                            <div class="status-indicator status-${status}"></div>
+                        </div>
+                        <div class="sensor-value">
+                            <span class="value-large color-${status}">${s.value.toFixed(1)}</span>
+                            <span class="value-unit">${s.unit}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // PM sensors
+            const pmSensors = [
+                { label: 'PM 2.5', value: data.particulate.pm25, warning: 25, critical: 30 },
+                { label: 'PM 10', value: data.particulate.pm10, warning: 40, critical: 45 }
+            ];
+
+            document.getElementById('pm-sensors').innerHTML = pmSensors.map(s => {
+                const status = getStatus(s.value, s.warning, s.critical);
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <p class="sensor-label">${s.label}</p>
+                            <div class="status-indicator status-${status}"></div>
+                        </div>
+                        <div class="sensor-value">
+                            <span class="value-large color-${status}">${s.value.toFixed(1)}</span>
+                            <span class="value-unit">μg/m³</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update charts
+            const time = new Date().toLocaleTimeString('en-US', {
+                hour12: false,
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            if (climateChart.data.labels.length >= 10) {
+                climateChart.data.labels.shift();
+                climateChart.data.datasets[0].data.shift();
+                climateChart.data.datasets[1].data.shift();
+                airChart.data.labels.shift();
+                airChart.data.datasets[0].data.shift();
+            }
+
+            climateChart.data.labels.push(time);
+            climateChart.data.datasets[0].data.push(data.temperature);
+            climateChart.data.datasets[1].data.push(data.humidity);
+            climateChart.update('none');
+
+            airChart.data.labels.push(time);
+            airChart.data.datasets[0].data.push(data.particulate.pm25);
+            airChart.update('none');
+        }
+
+        // Add event
+        function addEvent() {
+            if (Math.random() > 0.3) return;
+
+            const templates = [
+                { type: 'info', icon: 'ℹ️', color: '#3b82f6', sensor: 'Temperature', message: 'Reading normalized' },
+                { type: 'success', icon: '✓', color: '#22c55e', sensor: 'Humidity', message: 'Optimal range maintained' },
+                { type: 'warning', icon: '⚠️', color: '#f59e0b', sensor: 'PM 2.5', message: 'Elevated particulate detected' },
+                { type: 'error', icon: '✕', color: '#ef4444', sensor: 'NO₂', message: 'Critical level exceeded' }
+            ];
+
+            const template = templates[Math.floor(Math.random() * templates.length)];
+            const event = {
+                ...template,
+                message: `[Node ${currentNode}] ${template.message}`,
+                timestamp: new Date()
+            };
+
+            events.unshift(event);
+            events = events.slice(0, 50);
+
+            document.getElementById('event-count').textContent = events.length;
+            document.getElementById('event-log').innerHTML = events.map(e => `
+                <div class="event-item">
+                    <div class="event-icon" style="color: ${e.color}">${e.icon}</div>
+                    <div class="event-content">
+                        <div class="event-message">
+                            ${e.message} <span class="event-sensor">• ${e.sensor}</span>
+                        </div>
+                        <p class="event-time">${e.timestamp.toLocaleTimeString('en-US', {
+                            hour12: false,
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        })}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Switch node
+        function switchNode(nodeId) {
+            currentNode = nodeId;
+            document.querySelectorAll('.tab').forEach((tab, index) => {
+                tab.classList.toggle('active', index === nodeId - 1);
+            });
+
+            // Reset charts
+            climateChart.data.labels = [];
+            climateChart.data.datasets[0].data = [];
+            climateChart.data.datasets[1].data = [];
+            airChart.data.labels = [];
+            airChart.data.datasets[0].data = [];
+
+            // Reset events
+            events = [];
+            document.getElementById('event-log').innerHTML = '';
+
+            // Update status based on node
+            if (nodeId === 1) {
+                updateConnectionStatus(isLiveData);
+            } else {
+                updateConnectionStatus(false, 'Node 2');
+            }
+
+            // Note: sensorHistory is preserved across node switches
+            // so you can download historical data from each node
+
+            updateSensors();
+        }
+
+        // Update timestamp
+        function updateTimestamp() {
+            document.getElementById('timestamp').textContent = new Date().toLocaleTimeString();
+        }
+
+        // Toggle date inputs for custom range
+        function toggleDateInputs() {
+            const timeRange = document.getElementById('timeRange').value;
+            const dateInputs = document.getElementById('dateInputs');
+
+            if (timeRange === 'custom') {
+                dateInputs.classList.add('show');
+                // Set default dates
+                const today = new Date();
+                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                document.getElementById('endDate').valueAsDate = today;
+                document.getElementById('startDate').valueAsDate = weekAgo;
+            } else {
+                dateInputs.classList.remove('show');
+            }
+        }
+
+        // Toggle audio recording
+        async function toggleRecording() {
+            if (!isRecording) {
+                await startRecording();
+            } else {
+                stopRecording();
+            }
+        }
+
+        // Start audio recording
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                // Determine supported MIME type
+                let mimeType = 'audio/webm';
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    mimeType = 'audio/webm;codecs=opus';
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    mimeType = 'audio/mp4';
+                } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+                    mimeType = 'audio/ogg;codecs=opus';
+                }
+
+                mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: mimeType });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.href = audioUrl;
+
+                    // Determine file extension
+                    let extension = 'webm';
+                    if (mimeType.includes('mp4')) extension = 'mp4';
+                    else if (mimeType.includes('ogg')) extension = 'ogg';
+
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    link.download = `audio-recording-node${currentNode}-${timestamp}.${extension}`;
+                    link.style.display = 'none';
+
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // Clean up
+                    URL.revokeObjectURL(audioUrl);
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+
+                // Update UI
+                const recordBtn = document.getElementById('recordBtn');
+                recordBtn.classList.add('recording');
+                document.getElementById('recordIcon').textContent = '⏹️';
+                document.getElementById('recordText').textContent = 'Stop Recording';
+
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                alert('Unable to access microphone. Please grant microphone permissions and try again.');
+            }
+        }
+
+        // Stop audio recording
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+
+                // Update UI
+                const recordBtn = document.getElementById('recordBtn');
+                recordBtn.classList.remove('recording');
+                document.getElementById('recordIcon').textContent = '🎤';
+                document.getElementById('recordText').textContent = 'Record Audio';
+            }
+        }
+
+        // Download CSV
+        function downloadCSV() {
+            const timeRange = document.getElementById('timeRange').value;
+            const now = new Date();
+            let filteredData = [];
+            let timeLabel = '';
+
+            // Calculate start and end dates based on time range
+            let startDate, endDate;
+
+            switch (timeRange) {
+                case 'all':
+                    filteredData = sensorHistory.filter(record => record.node === currentNode);
+                    timeLabel = 'all-time';
+                    break;
+
+                case 'daily':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    timeLabel = 'daily';
+                    break;
+
+                case 'weekly':
+                    const dayOfWeek = now.getDay();
+                    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                    startDate = new Date(now.getTime() - daysToMonday * 24 * 60 * 60 * 1000);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
+                    endDate.setHours(23, 59, 59, 999);
+                    timeLabel = 'weekly';
+                    break;
+
+                case 'monthly':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+                    timeLabel = 'monthly';
+                    break;
+
+                case 'yearly':
+                    startDate = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+                    timeLabel = 'yearly';
+                    break;
+
+                case 'custom':
+                    const startInput = document.getElementById('startDate').value;
+                    const endInput = document.getElementById('endDate').value;
+
+                    if (!startInput || !endInput) {
+                        alert('Please select both start and end dates for custom range.');
+                        return;
+                    }
+
+                    startDate = new Date(startInput);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(endInput);
+                    endDate.setHours(23, 59, 59, 999);
+                    timeLabel = `${startInput}_to_${endInput}`;
+                    break;
+            }
+
+            // Filter data for non-all ranges
+            if (timeRange !== 'all') {
+                filteredData = sensorHistory.filter(record =>
+                    record.node === currentNode &&
+                    record.timestamp >= startDate &&
+                    record.timestamp <= endDate
+                );
+            }
+
+            if (filteredData.length === 0) {
+                alert('No data available for the selected time range. Please wait for data to be collected.');
+                return;
+            }
+
+            // Create CSV content
+            let csvContent = "Timestamp,Node,Sensor,Value,Unit,Status\n";
+
+            // Process each record in history
+            filteredData.forEach(record => {
+                const timestamp = record.timestamp.toISOString();
+                const data = record.data;
+
+                // Add primary sensors
+                const rows = [
+                    ['Temperature', data.temperature.toFixed(1), '°C', getStatus(data.temperature, 26, 30)],
+                    ['Humidity', data.humidity.toFixed(1), '%', getStatus(data.humidity, 55, 65)],
+                    ['Light Intensity', Math.round(data.lightIntensity), 'lux', getStatus(data.lightIntensity, 300, 200, true)],
+                    ['Noise Current', data.noise.current.toFixed(1), 'dB', getStatus(data.noise.current, 70, 85)],
+                    ['Noise Peak', data.noise.peak.toFixed(1), 'dB', '-'],
+                    ['Noise Average', data.noise.average.toFixed(1), 'dB', '-'],
+                    ['NH3', data.tvoc.nh3.toFixed(1), 'ppb', getStatus(data.tvoc.nh3, 35, 45)],
+                    ['NO2', data.tvoc.no2.toFixed(1), 'ppb', getStatus(data.tvoc.no2, 20, 25)],
+                    ['H2S', data.tvoc.h2s.toFixed(1), 'ppb', getStatus(data.tvoc.h2s, 15, 18)],
+                    ['CO', data.tvoc.co.toFixed(1), 'ppm', getStatus(data.tvoc.co, 70, 90)],
+                    ['PM 2.5', data.particulate.pm25.toFixed(1), 'μg/m³', getStatus(data.particulate.pm25, 25, 30)],
+                    ['PM 10', data.particulate.pm10.toFixed(1), 'μg/m³', getStatus(data.particulate.pm10, 40, 45)]
+                ];
+
+                rows.forEach(([sensor, value, unit, status]) => {
+                    csvContent += `${timestamp},Node ${record.node},${sensor},${value},${unit},${status}\n`;
+                });
+            });
+
+            // Create download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            const dateStr = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `sensor-data-node${currentNode}-${timeLabel}-${dateStr}.csv`);
+            link.style.visibility = 'hidden';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize
+        initCharts();
+        updateSensors();
+        updateTimestamp();
+
+        // Update intervals
+        setInterval(updateSensors, 2000);
+        setInterval(addEvent, 5000);
+        setInterval(updateTimestamp, 2000);
+    </script>
+</body>
+</html>
