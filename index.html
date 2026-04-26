@@ -411,6 +411,297 @@
             display: none;
         }
 
+        .prod-kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .prod-kpi-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .prod-kpi-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .prod-kpi {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .prod-kpi .pk-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .prod-kpi .pk-val {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 8px;
+            color: #f1f5f9;
+        }
+
+        .farm-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 12px;
+            color: #f1f5f9;
+        }
+
+        .farm-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .farm-summary-table th {
+            text-align: left;
+            color: #94a3b8;
+            font-weight: 600;
+            padding: 10px 12px 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            width: 42%;
+        }
+
+        .farm-summary-table td {
+            color: #f1f5f9;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .farm-table-wrap {
+            overflow: auto;
+            max-height: 360px;
+            margin-top: 8px;
+        }
+
+        .farm-table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .farm-table-wrap th,
+        .farm-table-wrap td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .farm-table-wrap thead th {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .farm-actions {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .btn-farm {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .btn-farm:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .farm-period-select {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        #production-toolbar-hint {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(139, 92, 246, 0.12);
+            border: 1px solid rgba(139, 92, 246, 0.28);
+            border-radius: 8px;
+            color: #c4b5fd;
+            font-size: 13px;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            #production-toolbar-hint {
+                width: auto;
+            }
+        }
+
+        .prod-context-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .prod-context-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            align-items: flex-end;
+        }
+
+        .prod-context-row label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .input-prod,
+        .select-prod {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #f1f5f9;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            min-width: 160px;
+        }
+
+        .select-prod option {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+
+        .prod-subtabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .prod-subtab {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .prod-subtab:hover {
+            color: #f1f5f9;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .prod-subtab.active {
+            color: #fff;
+            background: rgba(59, 130, 246, 0.25);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+        }
+
+        .prod-subtab.hidden-role {
+            display: none !important;
+        }
+
+        .prod-panel {
+            margin-bottom: 16px;
+        }
+
+        .form-grid-prod {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px 16px;
+            margin-top: 12px;
+        }
+
+        @media (min-width: 640px) {
+            .form-grid-prod {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .form-grid-prod label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .form-actions-prod {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .role-badge {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+        }
+
+        #monitoring-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            #monitoring-toolbar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                width: auto;
+                gap: 16px;
+            }
+        }
+
         .download-btn {
             background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             color: white;
@@ -614,6 +905,7 @@
                 </div>
             </div>
             <div class="controls-wrapper">
+                <div id="monitoring-toolbar">
                 <select id="timeRange" class="time-select" onchange="toggleDateInputs()">
                     <option value="all">All Time</option>
                     <option value="daily">Daily</option>
@@ -638,15 +930,19 @@
                     <div class="status-dot"></div>
                     <span class="subtitle">Streaming</span>
                 </div>
+                </div>
+                <div id="production-toolbar-hint" class="hidden"><span>📋</span> Farm records are saved in this browser only (localStorage).</div>
             </div>
         </div>
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab active" onclick="switchNode(1)">Node 1</button>
-            <button class="tab" onclick="switchNode(2)">Node 2</button>
+            <button type="button" class="tab tab-node active" onclick="switchNode(1)">Node 1</button>
+            <button type="button" class="tab tab-node" onclick="switchNode(2)">Node 2</button>
+            <button type="button" class="tab tab-production" onclick="switchToFarmRecords()">Production Data</button>
         </div>
 
+        <div id="view-monitoring">
         <!-- ThingSpeak Info -->
         <div id="thingspeakInfo" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;">
             <div>
@@ -740,10 +1036,268 @@
             </div>
             <div class="event-log" id="event-log"></div>
         </div>
+        </div>
+
+        <!-- Production Data: schema-aligned (local demo; replace with API + auth later) -->
+        <div id="view-production" class="hidden">
+            <div class="card prod-context-bar">
+                <div class="prod-context-row" style="align-items: center; justify-content: space-between;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+                        <span class="role-badge" id="pd-role-badge">Owner</span>
+                        <span class="subtitle" style="margin: 0;">Schema: farms → profiles → batches → daily / weights / inventory / sales / costs</span>
+                    </div>
+                    <div class="farm-actions" style="margin: 0;">
+                        <button type="button" class="btn-farm" id="pd-export-json">Export JSON backup</button>
+                        <button type="button" class="btn-farm" id="pd-import-json">Import JSON</button>
+                        <input type="file" id="pd-import-json-file" accept=".json,application/json" style="display: none;">
+                    </div>
+                </div>
+                <div class="prod-context-row">
+                    <label>Farm
+                        <select id="pd-farm-select" class="select-prod"></select>
+                    </label>
+                    <label>Acting role (demo)
+                        <select id="pd-role-select" class="select-prod">
+                            <option value="owner">Owner — full access</option>
+                            <option value="manager">Manager — no farm admin</option>
+                            <option value="staff">Staff — daily entry only</option>
+                        </select>
+                    </label>
+                    <label>Batch scope
+                        <select id="pd-batch-filter" class="select-prod">
+                            <option value="">All batches</option>
+                        </select>
+                    </label>
+                </div>
+                <p class="subtitle" style="margin: 0; line-height: 1.5;">Browser-only prototype. Production: Owner registers farm; Manager/Staff join with Farm ID. Real <code style="color:#94a3b8;">owner_id</code> and profiles come from your auth backend.</p>
+            </div>
+
+            <div class="prod-subtabs" id="pd-subtabs"></div>
+
+            <div id="pd-panel-overview" class="prod-panel card hidden">
+                <h2 class="farm-card-title">Overview</h2>
+                <div class="prod-kpi-row" id="pd-overview-kpis"></div>
+                <p class="subtitle" id="pd-overview-note" style="margin-top: 12px;"></p>
+            </div>
+
+            <div id="pd-panel-batches" class="prod-panel card hidden">
+                <h2 class="farm-card-title">Batches</h2>
+                <p class="subtitle">Table: <strong>batches</strong> — id, farm_id, name, strain, initial_birds, start_date, status</p>
+                <div class="farm-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th><th>Strain</th><th>Initial birds</th><th>Start</th><th>Status</th><th>id</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pd-tbody-batches"></tbody>
+                    </table>
+                </div>
+                <form id="pd-form-batch" class="form-grid-prod">
+                    <label>Name<input class="input-prod" name="name" required placeholder="Batch A"></label>
+                    <label>Strain<input class="input-prod" name="strain" placeholder="Cobb 500"></label>
+                    <label>Initial birds<input class="input-prod" type="number" name="initial_birds" min="0" value="0"></label>
+                    <label>Start date<input class="input-prod" type="date" name="start_date" required></label>
+                    <label>Status
+                        <select class="select-prod" name="status">
+                            <option value="active">active</option>
+                            <option value="closed">closed</option>
+                            <option value="planned">planned</option>
+                        </select>
+                    </label>
+                    <div class="form-actions-prod">
+                        <button type="submit" class="btn-farm">Add batch</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="pd-panel-daily" class="prod-panel card hidden">
+                <h2 class="farm-card-title">Daily records</h2>
+                <p class="subtitle">Table: <strong>daily_records</strong> — batch_id, date, mortality, feed_consumed, water_consumed</p>
+                <div class="farm-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Batch</th><th>Date</th><th>Mortality</th><th>Feed</th><th>Water</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pd-tbody-daily"></tbody>
+                    </table>
+                </div>
+                <form id="pd-form-daily" class="form-grid-prod">
+                    <label>Batch
+                        <select class="select-prod" name="batch_id" id="pd-daily-batch" required></select>
+                    </label>
+                    <label>Date<input class="input-prod" type="date" name="date" required></label>
+                    <label>Mortality (birds)<input class="input-prod" type="number" name="mortality" min="0" value="0"></label>
+                    <label>Feed consumed<input class="input-prod" type="number" name="feed_consumed" min="0" step="0.01" value="0"></label>
+                    <label>Water consumed<input class="input-prod" type="number" name="water_consumed" min="0" step="0.01" value="0"></label>
+                    <div class="form-actions-prod">
+                        <button type="submit" class="btn-farm">Save daily record</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="pd-panel-weights" class="prod-panel card hidden">
+                <h2 class="farm-card-title">Weight records</h2>
+                <p class="subtitle">Table: <strong>weight_records</strong> — batch_id, date, avg_weight, sample_size</p>
+                <div class="farm-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Batch</th><th>Date</th><th>Avg weight</th><th>Sample size</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pd-tbody-weights"></tbody>
+                    </table>
+                </div>
+                <form id="pd-form-weight" class="form-grid-prod">
+                    <label>Batch
+                        <select class="select-prod" name="batch_id" id="pd-weight-batch" required></select>
+                    </label>
+                    <label>Date<input class="input-prod" type="date" name="date" required></label>
+                    <label>Avg weight (g)<input class="input-prod" type="number" name="avg_weight" min="0" step="0.1" required></label>
+                    <label>Sample size<input class="input-prod" type="number" name="sample_size" min="1" value="30"></label>
+                    <div class="form-actions-prod">
+                        <button type="submit" class="btn-farm">Save weight record</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="pd-panel-inventory" class="prod-panel card hidden">
+                <h2 class="farm-card-title">Inventory</h2>
+                <p class="subtitle">Table: <strong>inventory</strong> — batch_id, type, brand, category, quantity, unit_cost, total_cost</p>
+                <div class="farm-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Batch</th><th>Type</th><th>Brand</th><th>Category</th><th>Qty</th><th>Unit cost</th><th>Total</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pd-tbody-inventory"></tbody>
+                    </table>
+                </div>
+                <form id="pd-form-inventory" class="form-grid-prod">
+                    <label>Batch
+                        <select class="select-prod" name="batch_id" id="pd-inv-batch" required></select>
+                    </label>
+                    <label>Type<input class="input-prod" name="type" placeholder="feed / med"></label>
+                    <label>Brand<input class="input-prod" name="brand"></label>
+                    <label>Category<input class="input-prod" name="category"></label>
+                    <label>Quantity<input class="input-prod" type="number" name="quantity" min="0" step="0.01" value="0"></label>
+                    <label>Unit cost<input class="input-prod" type="number" name="unit_cost" min="0" step="0.01" value="0"></label>
+                    <label>Total cost<input class="input-prod" type="number" name="total_cost" min="0" step="0.01" value="0"></label>
+                    <div class="form-actions-prod">
+                        <button type="submit" class="btn-farm">Add inventory line</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="pd-panel-sales" class="prod-panel card hidden">
+                <h2 class="farm-card-title">Sales</h2>
+                <p class="subtitle">Table: <strong>sales</strong> — batch_id, type, quantity, unit_price, total_revenue, buyer</p>
+                <div class="farm-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Batch</th><th>Type</th><th>Qty</th><th>Unit price</th><th>Revenue</th><th>Buyer</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pd-tbody-sales"></tbody>
+                    </table>
+                </div>
+                <form id="pd-form-sales" class="form-grid-prod">
+                    <label>Batch
+                        <select class="select-prod" name="batch_id" id="pd-sales-batch" required></select>
+                    </label>
+                    <label>Type<input class="input-prod" name="type" placeholder="live / dressed"></label>
+                    <label>Quantity<input class="input-prod" type="number" name="quantity" min="0" step="0.01" value="0"></label>
+                    <label>Unit price<input class="input-prod" type="number" name="unit_price" min="0" step="0.01" value="0"></label>
+                    <label>Total revenue<input class="input-prod" type="number" name="total_revenue" min="0" step="0.01" value="0"></label>
+                    <label>Buyer<input class="input-prod" name="buyer"></label>
+                    <div class="form-actions-prod">
+                        <button type="submit" class="btn-farm">Add sale</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="pd-panel-costs" class="prod-panel card hidden">
+                <h2 class="farm-card-title">Other costs</h2>
+                <p class="subtitle">Table: <strong>costs</strong> — batch_id, category, description, amount</p>
+                <div class="farm-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Batch</th><th>Category</th><th>Description</th><th>Amount</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pd-tbody-costs"></tbody>
+                    </table>
+                </div>
+                <form id="pd-form-costs" class="form-grid-prod">
+                    <label>Batch
+                        <select class="select-prod" name="batch_id" id="pd-costs-batch" required></select>
+                    </label>
+                    <label>Category<input class="input-prod" name="category" placeholder="labour / energy"></label>
+                    <label>Description<input class="input-prod" name="description"></label>
+                    <label>Amount<input class="input-prod" type="number" name="amount" min="0" step="0.01" value="0"></label>
+                    <div class="form-actions-prod">
+                        <button type="submit" class="btn-farm">Add cost</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="pd-panel-admin" class="prod-panel card hidden">
+                <h2 class="farm-card-title">Farms &amp; team (Owner)</h2>
+                <p class="subtitle"><strong>farms</strong>: id, name, owner_id &nbsp;|&nbsp; <strong>profiles</strong>: id, farm_id, full_name, role</p>
+                <h3 class="farm-card-title" style="font-size: 14px; margin-top: 16px;">Farms</h3>
+                <div class="farm-table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Name</th><th>owner_id</th><th>id</th><th></th></tr>
+                        </thead>
+                        <tbody id="pd-tbody-farms"></tbody>
+                    </table>
+                </div>
+                <form id="pd-form-farm" class="form-grid-prod">
+                    <label>Farm name<input class="input-prod" name="name" required></label>
+                    <label>Owner id (auth user id)<input class="input-prod" name="owner_id" placeholder="from Supabase Auth UUID"></label>
+                    <div class="form-actions-prod">
+                        <button type="submit" class="btn-farm">Add farm</button>
+                    </div>
+                </form>
+                <h3 class="farm-card-title" style="font-size: 14px; margin-top: 20px;">Profiles</h3>
+                <div class="farm-table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Farm</th><th>Full name</th><th>Role</th><th>id</th><th></th></tr>
+                        </thead>
+                        <tbody id="pd-tbody-profiles"></tbody>
+                    </table>
+                </div>
+                <form id="pd-form-profile" class="form-grid-prod">
+                    <label>Farm
+                        <select class="select-prod" name="farm_id" id="pd-profile-farm" required></select>
+                    </label>
+                    <label>Full name<input class="input-prod" name="full_name" required></label>
+                    <label>Role
+                        <select class="select-prod" name="role">
+                            <option value="owner">owner</option>
+                            <option value="manager">manager</option>
+                            <option value="staff">staff</option>
+                        </select>
+                    </label>
+                    <div class="form-actions-prod">
+                        <button type="submit" class="btn-farm">Add profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script>
         let currentNode = 1;
+        let dashboardView = 'monitoring';
         let chartData = { climate: [], air: [] };
         let events = [];
         let climateChart, airChart;
@@ -1003,8 +1557,30 @@
             return 'green';
         }
 
+        function showMonitoringView() {
+            dashboardView = 'monitoring';
+            document.getElementById('view-monitoring').classList.remove('hidden');
+            document.getElementById('view-production').classList.add('hidden');
+            document.getElementById('monitoring-toolbar').classList.remove('hidden');
+            document.getElementById('production-toolbar-hint').classList.add('hidden');
+            document.querySelector('.tab-production')?.classList.remove('active');
+        }
+
+        function switchToFarmRecords() {
+            dashboardView = 'production';
+            document.getElementById('view-monitoring').classList.add('hidden');
+            document.getElementById('view-production').classList.remove('hidden');
+            document.getElementById('monitoring-toolbar').classList.add('hidden');
+            document.getElementById('production-toolbar-hint').classList.remove('hidden');
+            document.querySelectorAll('.tab-node').forEach((t) => t.classList.remove('active'));
+            document.querySelector('.tab-production')?.classList.add('active');
+            if (typeof pdOnShowProductionTab === 'function') pdOnShowProductionTab();
+        }
+
         // Update sensors
         async function updateSensors() {
+            if (dashboardView !== 'monitoring') return;
+
             let data;
 
             // Use ThingSpeak data for Node 1, mock data for Node 2
@@ -1178,8 +1754,9 @@
 
         // Switch node
         function switchNode(nodeId) {
+            showMonitoringView();
             currentNode = nodeId;
-            document.querySelectorAll('.tab').forEach((tab, index) => {
+            document.querySelectorAll('.tab-node').forEach((tab, index) => {
                 tab.classList.toggle('active', index === nodeId - 1);
             });
 
@@ -1482,6 +2059,698 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        // —— Production Data: relational schema (browser localStorage demo) ——
+        const PD_STORAGE_KEY = 'productiondata_schema_v2';
+        const PD_ROLE_ORDER = { staff: 0, manager: 1, owner: 2 };
+
+        const pdState = {
+            role: 'owner',
+            farmId: null,
+            batchFilter: '',
+            activePanel: 'overview',
+            wired: false
+        };
+
+        function pdGenId() {
+            return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 11);
+        }
+
+        function pdLoadDb() {
+            try {
+                const raw = localStorage.getItem(PD_STORAGE_KEY);
+                if (raw) {
+                    const db = JSON.parse(raw);
+                    if (db && Array.isArray(db.farms)) return db;
+                }
+            } catch (e) { console.warn(e); }
+            const db = {
+                farms: [],
+                profiles: [],
+                batches: [],
+                daily_records: [],
+                weight_records: [],
+                inventory: [],
+                sales: [],
+                costs: []
+            };
+            const ownerId = pdGenId();
+            const farmId = pdGenId();
+            db.farms.push({ id: farmId, name: 'Main Farm', owner_id: ownerId });
+            db.profiles.push({ id: pdGenId(), farm_id: farmId, full_name: 'Demo Owner', role: 'owner' });
+            pdSaveDb(db);
+            return db;
+        }
+
+        function pdSaveDb(db) {
+            localStorage.setItem(PD_STORAGE_KEY, JSON.stringify(db));
+        }
+
+        function pdEsc(s) {
+            const d = document.createElement('div');
+            d.textContent = s == null ? '' : String(s);
+            return d.innerHTML;
+        }
+
+        function pdRoleAtLeast(minRole) {
+            return PD_ROLE_ORDER[pdState.role] >= PD_ROLE_ORDER[minRole];
+        }
+
+        function pdCurrentFarmId() {
+            const db = pdLoadDb();
+            return pdState.farmId || db.farms[0]?.id || null;
+        }
+
+        function pdBatchesForFarm(farmId) {
+            if (!farmId) return [];
+            return pdLoadDb().batches.filter((b) => b.farm_id === farmId);
+        }
+
+        function pdBatchLabel(batchId) {
+            const b = pdLoadDb().batches.find((x) => x.id === batchId);
+            return b ? b.name : String(batchId).slice(0, 10);
+        }
+
+        function pdFarmLabel(farmId) {
+            const f = pdLoadDb().farms.find((x) => x.id === farmId);
+            return f ? f.name : farmId;
+        }
+
+        function pdBatchIdSet() {
+            const farmId = pdCurrentFarmId();
+            const ids = new Set(pdBatchesForFarm(farmId).map((b) => b.id));
+            if (pdState.batchFilter) {
+                const one = new Set();
+                if (ids.has(pdState.batchFilter)) one.add(pdState.batchFilter);
+                return one;
+            }
+            return ids;
+        }
+
+        function pdFilterRows(rows) {
+            const ids = pdBatchIdSet();
+            return rows.filter((r) => ids.has(r.batch_id));
+        }
+
+        function pdToday() {
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        function pdPopulateFarmSelect() {
+            const sel = document.getElementById('pd-farm-select');
+            if (!sel) return;
+            const db = pdLoadDb();
+            sel.innerHTML = '';
+            db.farms.forEach((f) => {
+                const o = document.createElement('option');
+                o.value = f.id;
+                o.textContent = f.name;
+                sel.appendChild(o);
+            });
+            if (pdState.farmId && db.farms.some((f) => f.id === pdState.farmId)) {
+                sel.value = pdState.farmId;
+            } else if (db.farms[0]) {
+                pdState.farmId = db.farms[0].id;
+                sel.value = pdState.farmId;
+            }
+        }
+
+        function pdPopulateBatchFilter() {
+            const sel = document.getElementById('pd-batch-filter');
+            if (!sel) return;
+            const cur = pdState.batchFilter;
+            sel.innerHTML = '<option value="">All batches</option>';
+            pdBatchesForFarm(pdCurrentFarmId()).forEach((b) => {
+                const o = document.createElement('option');
+                o.value = b.id;
+                o.textContent = b.name;
+                sel.appendChild(o);
+            });
+            if (cur && [...sel.options].some((o) => o.value === cur)) sel.value = cur;
+            else pdState.batchFilter = '';
+        }
+
+        function pdFillBatchSelects() {
+            const farmId = pdCurrentFarmId();
+            const batches = pdBatchesForFarm(farmId);
+            const html = batches.map((b) => `<option value="${pdEsc(b.id)}">${pdEsc(b.name)}</option>`).join('');
+            ['pd-daily-batch', 'pd-weight-batch', 'pd-inv-batch', 'pd-sales-batch', 'pd-costs-batch'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const v = el.value;
+                el.innerHTML = html || '<option value="">— Add a batch first —</option>';
+                if (v && [...el.options].some((o) => o.value === v)) el.value = v;
+            });
+            const pf = document.getElementById('pd-profile-farm');
+            if (pf) {
+                pf.innerHTML = pdLoadDb().farms.map((f) => `<option value="${pdEsc(f.id)}">${pdEsc(f.name)}</option>`).join('');
+            }
+        }
+
+        function pdBuildSubtabs() {
+            const host = document.getElementById('pd-subtabs');
+            if (!host) return;
+            const tabs = [
+                { id: 'overview', label: 'Overview', min: 'staff' },
+                { id: 'batches', label: 'Batches', min: 'manager' },
+                { id: 'daily', label: 'Daily records', min: 'staff' },
+                { id: 'weights', label: 'Weight records', min: 'staff' },
+                { id: 'inventory', label: 'Inventory', min: 'manager' },
+                { id: 'sales', label: 'Sales', min: 'manager' },
+                { id: 'costs', label: 'Costs', min: 'manager' },
+                { id: 'admin', label: 'Farms & team', min: 'owner' }
+            ];
+            host.innerHTML = '';
+            tabs.forEach((t) => {
+                if (!pdRoleAtLeast(t.min)) return;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'prod-subtab' + (t.id === pdState.activePanel ? ' active' : '');
+                btn.textContent = t.label;
+                btn.dataset.panel = t.id;
+                btn.addEventListener('click', () => pdSwitchPanel(t.id));
+                host.appendChild(btn);
+            });
+        }
+
+        function pdEnsureValidPanel() {
+            const allowed = [];
+            if (pdRoleAtLeast('staff')) allowed.push('overview', 'daily', 'weights');
+            if (pdRoleAtLeast('manager')) allowed.push('batches', 'inventory', 'sales', 'costs');
+            if (pdRoleAtLeast('owner')) allowed.push('admin');
+            if (!allowed.includes(pdState.activePanel)) pdState.activePanel = 'overview';
+        }
+
+        function pdSwitchPanel(id) {
+            pdState.activePanel = id;
+            document.querySelectorAll('.prod-subtab').forEach((b) => {
+                b.classList.toggle('active', b.dataset.panel === id);
+            });
+            document.querySelectorAll('#view-production .prod-panel').forEach((p) => p.classList.add('hidden'));
+            const panel = document.getElementById('pd-panel-' + id);
+            if (panel) panel.classList.remove('hidden');
+            pdFillBatchSelects();
+            const fd = document.querySelector('#pd-form-daily input[name="date"]');
+            if (fd) fd.value = pdToday();
+            const fw = document.querySelector('#pd-form-weight input[name="date"]');
+            if (fw) fw.value = pdToday();
+            const fb = document.querySelector('#pd-form-batch input[name="start_date"]');
+            if (fb && !fb.value) fb.value = pdToday();
+            pdRenderPanel(id);
+        }
+
+        function pdRenderPanel(id) {
+            switch (id) {
+                case 'overview': pdRenderOverview(); break;
+                case 'batches': pdRenderBatches(); break;
+                case 'daily': pdRenderDaily(); break;
+                case 'weights': pdRenderWeights(); break;
+                case 'inventory': pdRenderInventory(); break;
+                case 'sales': pdRenderSales(); break;
+                case 'costs': pdRenderCosts(); break;
+                case 'admin': pdRenderAdmin(); break;
+            }
+        }
+
+        function pdRenderOverview() {
+            const db = pdLoadDb();
+            const farmId = pdCurrentFarmId();
+            const batches = db.batches.filter((b) => b.farm_id === farmId);
+            const idSet = pdBatchIdSet();
+            const daily = pdFilterRows(db.daily_records);
+            const mort = daily.reduce((s, r) => s + (Number(r.mortality) || 0), 0);
+            const activeBatches = batches.filter((b) => idSet.has(b.id) && b.status === 'active').length;
+
+            const kpis = document.getElementById('pd-overview-kpis');
+            let html = `
+                <div class="prod-kpi"><div class="pk-label">Active batches (scope)</div><div class="pk-val">${activeBatches}</div></div>
+                <div class="prod-kpi"><div class="pk-label">Σ Mortality (daily)</div><div class="pk-val">${mort}</div></div>`;
+            if (pdRoleAtLeast('manager')) {
+                const inv = pdFilterRows(db.inventory).reduce((s, r) => s + (Number(r.total_cost) || 0), 0);
+                const sal = pdFilterRows(db.sales).reduce((s, r) => s + (Number(r.total_revenue) || 0), 0);
+                const cst = pdFilterRows(db.costs).reduce((s, r) => s + (Number(r.amount) || 0), 0);
+                html += `
+                <div class="prod-kpi"><div class="pk-label">Inventory spend</div><div class="pk-val">${inv.toFixed(0)}</div></div>
+                <div class="prod-kpi"><div class="pk-label">Sales revenue</div><div class="pk-val">${sal.toFixed(0)}</div></div>
+                <div class="prod-kpi"><div class="pk-label">Other costs</div><div class="pk-val">${cst.toFixed(0)}</div></div>`;
+            }
+            kpis.innerHTML = html;
+            document.getElementById('pd-overview-note').textContent = pdRoleAtLeast('manager')
+                ? 'Financial KPIs sum inventory.total_cost, sales.total_revenue, and costs.amount for the selected farm and batch filter.'
+                : 'Staff: operational counts only. Managers and owners see financial totals.';
+        }
+
+        function pdRenderBatches() {
+            const tbody = document.getElementById('pd-tbody-batches');
+            const farmId = pdCurrentFarmId();
+            let rows = pdLoadDb().batches.filter((b) => b.farm_id === farmId);
+            if (pdState.batchFilter) rows = rows.filter((b) => b.id === pdState.batchFilter);
+            tbody.innerHTML = rows.map((b) => `
+                <tr>
+                    <td>${pdEsc(b.name)}</td>
+                    <td>${pdEsc(b.strain || '—')}</td>
+                    <td>${pdEsc(b.initial_birds)}</td>
+                    <td>${pdEsc(b.start_date)}</td>
+                    <td>${pdEsc(b.status)}</td>
+                    <td style="font-size:11px;color:#64748b">${pdEsc(b.id)}</td>
+                    <td><button type="button" class="btn-farm pd-del-batch" data-id="${pdEsc(b.id)}">Delete</button></td>
+                </tr>`).join('');
+            tbody.querySelectorAll('.pd-del-batch').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    if (!confirm('Delete this batch and all linked daily/weight/inventory/sales/cost rows?')) return;
+                    pdDeleteBatch(btn.getAttribute('data-id'));
+                });
+            });
+        }
+
+        function pdDeleteBatch(batchId) {
+            let db = pdLoadDb();
+            db.batches = db.batches.filter((b) => b.id !== batchId);
+            db.daily_records = db.daily_records.filter((r) => r.batch_id !== batchId);
+            db.weight_records = db.weight_records.filter((r) => r.batch_id !== batchId);
+            db.inventory = db.inventory.filter((r) => r.batch_id !== batchId);
+            db.sales = db.sales.filter((r) => r.batch_id !== batchId);
+            db.costs = db.costs.filter((r) => r.batch_id !== batchId);
+            pdSaveDb(db);
+            pdPopulateBatchFilter();
+            pdFillBatchSelects();
+            pdRenderPanel(pdState.activePanel);
+        }
+
+        function pdRenderDaily() {
+            const tbody = document.getElementById('pd-tbody-daily');
+            let rows = pdFilterRows(pdLoadDb().daily_records).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+            tbody.innerHTML = rows.map((r) => `
+                <tr>
+                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
+                    <td>${pdEsc(r.date)}</td>
+                    <td>${pdEsc(r.mortality)}</td>
+                    <td>${pdEsc(r.feed_consumed)}</td>
+                    <td>${pdEsc(r.water_consumed)}</td>
+                    <td><button type="button" class="btn-farm pd-del-daily" data-id="${pdEsc(r.id)}">Delete</button></td>
+                </tr>`).join('');
+            tbody.querySelectorAll('.pd-del-daily').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const db = pdLoadDb();
+                    db.daily_records = db.daily_records.filter((x) => x.id !== id);
+                    pdSaveDb(db);
+                    pdRenderDaily();
+                    if (pdState.activePanel === 'overview') pdRenderOverview();
+                });
+            });
+        }
+
+        function pdRenderWeights() {
+            const tbody = document.getElementById('pd-tbody-weights');
+            let rows = pdFilterRows(pdLoadDb().weight_records).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+            tbody.innerHTML = rows.map((r) => `
+                <tr>
+                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
+                    <td>${pdEsc(r.date)}</td>
+                    <td>${pdEsc(r.avg_weight)}</td>
+                    <td>${pdEsc(r.sample_size)}</td>
+                    <td><button type="button" class="btn-farm pd-del-w" data-id="${pdEsc(r.id)}">Delete</button></td>
+                </tr>`).join('');
+            tbody.querySelectorAll('.pd-del-w').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const db = pdLoadDb();
+                    db.weight_records = db.weight_records.filter((x) => x.id !== id);
+                    pdSaveDb(db);
+                    pdRenderWeights();
+                });
+            });
+        }
+
+        function pdRenderInventory() {
+            const tbody = document.getElementById('pd-tbody-inventory');
+            const rows = pdFilterRows(pdLoadDb().inventory).slice().reverse();
+            tbody.innerHTML = rows.map((r) => `
+                <tr>
+                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
+                    <td>${pdEsc(r.type)}</td>
+                    <td>${pdEsc(r.brand)}</td>
+                    <td>${pdEsc(r.category)}</td>
+                    <td>${pdEsc(r.quantity)}</td>
+                    <td>${pdEsc(r.unit_cost)}</td>
+                    <td>${pdEsc(r.total_cost)}</td>
+                    <td><button type="button" class="btn-farm pd-del-i" data-id="${pdEsc(r.id)}">Delete</button></td>
+                </tr>`).join('');
+            tbody.querySelectorAll('.pd-del-i').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const db = pdLoadDb();
+                    db.inventory = db.inventory.filter((x) => x.id !== id);
+                    pdSaveDb(db);
+                    pdRenderInventory();
+                    if (pdState.activePanel === 'overview') pdRenderOverview();
+                });
+            });
+        }
+
+        function pdRenderSales() {
+            const tbody = document.getElementById('pd-tbody-sales');
+            const rows = pdFilterRows(pdLoadDb().sales).slice().reverse();
+            tbody.innerHTML = rows.map((r) => `
+                <tr>
+                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
+                    <td>${pdEsc(r.type)}</td>
+                    <td>${pdEsc(r.quantity)}</td>
+                    <td>${pdEsc(r.unit_price)}</td>
+                    <td>${pdEsc(r.total_revenue)}</td>
+                    <td>${pdEsc(r.buyer)}</td>
+                    <td><button type="button" class="btn-farm pd-del-s" data-id="${pdEsc(r.id)}">Delete</button></td>
+                </tr>`).join('');
+            tbody.querySelectorAll('.pd-del-s').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const db = pdLoadDb();
+                    db.sales = db.sales.filter((x) => x.id !== id);
+                    pdSaveDb(db);
+                    pdRenderSales();
+                    if (pdState.activePanel === 'overview') pdRenderOverview();
+                });
+            });
+        }
+
+        function pdRenderCosts() {
+            const tbody = document.getElementById('pd-tbody-costs');
+            const rows = pdFilterRows(pdLoadDb().costs).slice().reverse();
+            tbody.innerHTML = rows.map((r) => `
+                <tr>
+                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
+                    <td>${pdEsc(r.category)}</td>
+                    <td>${pdEsc(r.description)}</td>
+                    <td>${pdEsc(r.amount)}</td>
+                    <td><button type="button" class="btn-farm pd-del-c" data-id="${pdEsc(r.id)}">Delete</button></td>
+                </tr>`).join('');
+            tbody.querySelectorAll('.pd-del-c').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const db = pdLoadDb();
+                    db.costs = db.costs.filter((x) => x.id !== id);
+                    pdSaveDb(db);
+                    pdRenderCosts();
+                    if (pdState.activePanel === 'overview') pdRenderOverview();
+                });
+            });
+        }
+
+        function pdRenderAdmin() {
+            const db = pdLoadDb();
+            document.getElementById('pd-tbody-farms').innerHTML = db.farms.map((f) => `
+                <tr>
+                    <td>${pdEsc(f.name)}</td>
+                    <td style="font-size:12px">${pdEsc(f.owner_id)}</td>
+                    <td style="font-size:11px;color:#64748b">${pdEsc(f.id)}</td>
+                    <td><button type="button" class="btn-farm pd-del-farm" data-id="${pdEsc(f.id)}">Delete</button></td>
+                </tr>`).join('');
+            document.getElementById('pd-tbody-farms').querySelectorAll('.pd-del-farm').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    if (pdLoadDb().farms.length <= 1) { alert('Keep at least one farm.'); return; }
+                    if (!confirm('Delete farm and ALL related data?')) return;
+                    let d = pdLoadDb();
+                    const bIds = d.batches.filter((b) => b.farm_id === id).map((b) => b.id);
+                    d.farms = d.farms.filter((f) => f.id !== id);
+                    d.profiles = d.profiles.filter((p) => p.farm_id !== id);
+                    d.batches = d.batches.filter((b) => b.farm_id !== id);
+                    d.daily_records = d.daily_records.filter((r) => !bIds.includes(r.batch_id));
+                    d.weight_records = d.weight_records.filter((r) => !bIds.includes(r.batch_id));
+                    d.inventory = d.inventory.filter((r) => !bIds.includes(r.batch_id));
+                    d.sales = d.sales.filter((r) => !bIds.includes(r.batch_id));
+                    d.costs = d.costs.filter((r) => !bIds.includes(r.batch_id));
+                    pdSaveDb(d);
+                    pdState.farmId = pdLoadDb().farms[0]?.id || null;
+                    pdRefreshChrome();
+                });
+            });
+
+            document.getElementById('pd-tbody-profiles').innerHTML = db.profiles.map((p) => `
+                <tr>
+                    <td>${pdEsc(pdFarmLabel(p.farm_id))}</td>
+                    <td>${pdEsc(p.full_name)}</td>
+                    <td>${pdEsc(p.role)}</td>
+                    <td style="font-size:11px;color:#64748b">${pdEsc(p.id)}</td>
+                    <td><button type="button" class="btn-farm pd-del-prof" data-id="${pdEsc(p.id)}">Delete</button></td>
+                </tr>`).join('');
+            document.getElementById('pd-tbody-profiles').querySelectorAll('.pd-del-prof').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const d = pdLoadDb();
+                    d.profiles = d.profiles.filter((p) => p.id !== id);
+                    pdSaveDb(d);
+                    pdRenderAdmin();
+                });
+            });
+        }
+
+        function pdRefreshChrome() {
+            pdPopulateFarmSelect();
+            pdPopulateBatchFilter();
+            pdFillBatchSelects();
+            pdBuildSubtabs();
+            pdEnsureValidPanel();
+            pdSwitchPanel(pdState.activePanel);
+            const badge = document.getElementById('pd-role-badge');
+            if (badge) badge.textContent = pdState.role.charAt(0).toUpperCase() + pdState.role.slice(1);
+        }
+
+        function pdWireOnce() {
+            if (pdState.wired) return;
+            pdState.wired = true;
+
+            document.getElementById('pd-farm-select')?.addEventListener('change', (e) => {
+                pdState.farmId = e.target.value;
+                localStorage.setItem('pd_demo_farm', pdState.farmId);
+                pdPopulateBatchFilter();
+                pdRefreshChrome();
+            });
+
+            document.getElementById('pd-role-select')?.addEventListener('change', (e) => {
+                pdState.role = e.target.value;
+                localStorage.setItem('pd_demo_role', pdState.role);
+                pdEnsureValidPanel();
+                pdRefreshChrome();
+            });
+
+            document.getElementById('pd-batch-filter')?.addEventListener('change', (e) => {
+                pdState.batchFilter = e.target.value;
+                pdRefreshChrome();
+            });
+
+            document.getElementById('pd-form-batch')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!pdRoleAtLeast('manager')) return;
+                const farmId = pdCurrentFarmId();
+                if (!farmId) return;
+                const fd = new FormData(e.target);
+                const db = pdLoadDb();
+                db.batches.push({
+                    id: pdGenId(),
+                    farm_id: farmId,
+                    name: String(fd.get('name') || '').trim(),
+                    strain: String(fd.get('strain') || '').trim(),
+                    initial_birds: parseInt(fd.get('initial_birds'), 10) || 0,
+                    start_date: String(fd.get('start_date') || ''),
+                    status: String(fd.get('status') || 'active')
+                });
+                pdSaveDb(db);
+                e.target.reset();
+                const sd = e.target.querySelector('[name="start_date"]');
+                if (sd) sd.value = pdToday();
+                pdRefreshChrome();
+            });
+
+            document.getElementById('pd-form-daily')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const batchId = String(fd.get('batch_id') || '');
+                if (!batchId) { alert('Select a batch.'); return; }
+                const db = pdLoadDb();
+                db.daily_records.push({
+                    id: pdGenId(),
+                    batch_id: batchId,
+                    date: String(fd.get('date') || ''),
+                    mortality: parseFloat(fd.get('mortality')) || 0,
+                    feed_consumed: parseFloat(fd.get('feed_consumed')) || 0,
+                    water_consumed: parseFloat(fd.get('water_consumed')) || 0
+                });
+                pdSaveDb(db);
+                e.target.querySelector('[name="date"]').value = pdToday();
+                pdRenderDaily();
+                if (pdState.activePanel === 'overview') pdRenderOverview();
+            });
+
+            document.getElementById('pd-form-weight')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const batchId = String(fd.get('batch_id') || '');
+                if (!batchId) { alert('Select a batch.'); return; }
+                const db = pdLoadDb();
+                db.weight_records.push({
+                    id: pdGenId(),
+                    batch_id: batchId,
+                    date: String(fd.get('date') || ''),
+                    avg_weight: parseFloat(fd.get('avg_weight')) || 0,
+                    sample_size: parseInt(fd.get('sample_size'), 10) || 0
+                });
+                pdSaveDb(db);
+                e.target.querySelector('[name="date"]').value = pdToday();
+                pdRenderWeights();
+            });
+
+            document.getElementById('pd-form-inventory')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!pdRoleAtLeast('manager')) return;
+                const fd = new FormData(e.target);
+                const batchId = String(fd.get('batch_id') || '');
+                if (!batchId) return;
+                const db = pdLoadDb();
+                db.inventory.push({
+                    id: pdGenId(),
+                    batch_id: batchId,
+                    type: String(fd.get('type') || ''),
+                    brand: String(fd.get('brand') || ''),
+                    category: String(fd.get('category') || ''),
+                    quantity: parseFloat(fd.get('quantity')) || 0,
+                    unit_cost: parseFloat(fd.get('unit_cost')) || 0,
+                    total_cost: parseFloat(fd.get('total_cost')) || 0
+                });
+                pdSaveDb(db);
+                e.target.reset();
+                pdRenderInventory();
+                if (pdState.activePanel === 'overview') pdRenderOverview();
+            });
+
+            document.getElementById('pd-form-sales')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!pdRoleAtLeast('manager')) return;
+                const fd = new FormData(e.target);
+                const batchId = String(fd.get('batch_id') || '');
+                if (!batchId) return;
+                const db = pdLoadDb();
+                db.sales.push({
+                    id: pdGenId(),
+                    batch_id: batchId,
+                    type: String(fd.get('type') || ''),
+                    quantity: parseFloat(fd.get('quantity')) || 0,
+                    unit_price: parseFloat(fd.get('unit_price')) || 0,
+                    total_revenue: parseFloat(fd.get('total_revenue')) || 0,
+                    buyer: String(fd.get('buyer') || '')
+                });
+                pdSaveDb(db);
+                e.target.reset();
+                pdRenderSales();
+                if (pdState.activePanel === 'overview') pdRenderOverview();
+            });
+
+            document.getElementById('pd-form-costs')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!pdRoleAtLeast('manager')) return;
+                const fd = new FormData(e.target);
+                const batchId = String(fd.get('batch_id') || '');
+                if (!batchId) return;
+                const db = pdLoadDb();
+                db.costs.push({
+                    id: pdGenId(),
+                    batch_id: batchId,
+                    category: String(fd.get('category') || ''),
+                    description: String(fd.get('description') || ''),
+                    amount: parseFloat(fd.get('amount')) || 0
+                });
+                pdSaveDb(db);
+                e.target.reset();
+                pdRenderCosts();
+                if (pdState.activePanel === 'overview') pdRenderOverview();
+            });
+
+            document.getElementById('pd-form-farm')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!pdRoleAtLeast('owner')) return;
+                const fd = new FormData(e.target);
+                const db = pdLoadDb();
+                const oid = String(fd.get('owner_id') || '').trim() || pdGenId();
+                db.farms.push({
+                    id: pdGenId(),
+                    name: String(fd.get('name') || '').trim(),
+                    owner_id: oid
+                });
+                pdSaveDb(db);
+                e.target.reset();
+                pdRefreshChrome();
+            });
+
+            document.getElementById('pd-form-profile')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!pdRoleAtLeast('owner')) return;
+                const fd = new FormData(e.target);
+                const db = pdLoadDb();
+                db.profiles.push({
+                    id: pdGenId(),
+                    farm_id: String(fd.get('farm_id') || ''),
+                    full_name: String(fd.get('full_name') || '').trim(),
+                    role: String(fd.get('role') || 'staff')
+                });
+                pdSaveDb(db);
+                e.target.reset();
+                pdRenderAdmin();
+            });
+
+            document.getElementById('pd-export-json')?.addEventListener('click', () => {
+                const blob = new Blob([JSON.stringify(pdLoadDb(), null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `production_data_backup_${pdToday()}.json`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+
+            document.getElementById('pd-import-json')?.addEventListener('click', () => {
+                document.getElementById('pd-import-json-file')?.click();
+            });
+
+            document.getElementById('pd-import-json-file')?.addEventListener('change', (ev) => {
+                const file = ev.target.files && ev.target.files[0];
+                ev.target.value = '';
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const raw = JSON.parse(String(reader.result || ''));
+                        const data = {
+                            farms: Array.isArray(raw.farms) ? raw.farms : [],
+                            profiles: Array.isArray(raw.profiles) ? raw.profiles : [],
+                            batches: Array.isArray(raw.batches) ? raw.batches : [],
+                            daily_records: Array.isArray(raw.daily_records) ? raw.daily_records : [],
+                            weight_records: Array.isArray(raw.weight_records) ? raw.weight_records : [],
+                            inventory: Array.isArray(raw.inventory) ? raw.inventory : [],
+                            sales: Array.isArray(raw.sales) ? raw.sales : [],
+                            costs: Array.isArray(raw.costs) ? raw.costs : []
+                        };
+                        if (!data.farms.length) throw new Error('Backup must include at least one farm');
+                        pdSaveDb(data);
+                        pdState.farmId = data.farms[0]?.id || null;
+                        pdRefreshChrome();
+                        alert('Import complete.');
+                    } catch (err) {
+                        alert('Import failed: ' + (err.message || err));
+                    }
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        function pdOnShowProductionTab() {
+            pdWireOnce();
+            const r = localStorage.getItem('pd_demo_role');
+            if (r === 'owner' || r === 'manager' || r === 'staff') pdState.role = r;
+            const f = localStorage.getItem('pd_demo_farm');
+            if (f && pdLoadDb().farms.some((x) => x.id === f)) pdState.farmId = f;
+            document.getElementById('pd-role-select').value = pdState.role;
+            pdRefreshChrome();
         }
 
         // Initialize
