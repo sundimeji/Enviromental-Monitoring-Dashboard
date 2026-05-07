@@ -85,9 +85,6 @@
         .status-green { background-color: #22c55e; }
         .status-amber { background-color: #f59e0b; }
         .status-red { background-color: #ef4444; }
-        .status-orange { background-color: #f97316; }
-        .color-orange { color: #f97316; }
-
         .sensor-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 600; margin-bottom: 8px; }
         .sensor-value { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
         .value-large { font-size: 28px; font-weight: 700; }
@@ -339,12 +336,12 @@
         <div style="margin-bottom: 24px;">
             <div class="section-header"><h3>🌬️ Total Volatile Organic Compounds</h3></div>
             <div class="grid grid-4" id="tvoc-sensors"></div>
-            <div class="threshold-info">⚠️ Thresholds: NH₃ (🟢0–10 🟡11–25 🟠26–50 🔴>50 ppm) | H₂S (🟢0–2 🟡3–5 🟠6–10 🔴>10 ppm) | NO₂ (🟢0–1 🟡1.1–2 🟠2.1–5 🔴>5 ppm) | CO (🟢0–10 🟡11–25 🟠26–50 🔴>50 ppm)</div>
+            <div class="threshold-info">⚠️ NH₃ Thresholds: Safe (0-10ppm) | Caution (11-25ppm) | Critical (26-50ppm) | NO₂ (>0.020ppm) | H₂S (>0.015ppm) | CO (>0.020ppm)</div>
         </div>
         <div style="margin-bottom: 24px;">
             <div class="section-header"><h3>⚠️ Particulate Matter</h3></div>
             <div class="grid grid-2" id="pm-sensors"></div>
-            <div class="threshold-info">⚠️ Thresholds: PM2.5 (&gt;30μg/m³), PM1 (&gt;45μg/m³)</div>
+            <div class="threshold-info">⚠️ Thresholds: PM2.5 (&gt;30μg/m³), PM10 (&gt;45μg/m³)</div>
         </div>
         <div style="margin-bottom: 24px;">
             <div class="section-header"><h3>📈 Trend Analysis</h3></div>
@@ -377,7 +374,9 @@
     let isNode1Online = false;
     let lastDataTimestamp = null;
     
-    // For CO mechanism (now direct from field3)
+    // For CO delay mechanism
+    let delayedCOValue = 0.005;
+    let pendingCOUpdate = null;
     let currentNO2Value = 0.005;
 
     const THINGSPEAK_CHANNEL_ID = '3187445';
@@ -391,13 +390,6 @@
     function getNH3Status(value) {
         if (value <= 10) return 'green';
         if (value <= 25) return 'amber';
-        return 'red';
-    }
-
-    function getStatus(value, safe, caution, alert) {
-        if (value <= safe) return 'green';
-        if (value <= caution) return 'amber';
-        if (value <= alert) return 'orange';
         return 'red';
     }
 
@@ -456,10 +448,19 @@
                 updateConnectionStatusDisplay(isNode1Online, dataTimestamp);
                 updateTimestamp();
                 
-                const no2Raw = feed.field3 || '0.005';
-                currentNO2Value = parseFloat(no2Raw) || 0.005;
+                currentNO2Value = parseFloat(feed.field3) || 0.005;
                 
-                const nh3Ppm = parseFloat(feed.field8) || 10.0; // ThingSpeak NH3 feed is already in ppm
+                if (pendingCOUpdate) clearTimeout(pendingCOUpdate);
+                pendingCOUpdate = setTimeout(() => {
+                    delayedCOValue = currentNO2Value;
+                    if (dashboardView === 'monitoring') updateTVOCDisplay();
+                    pendingCOUpdate = null;
+                }, 10000);
+                
+                // NH3: Convert from ppb to ppm (divide by 1000)
+                // Then apply thresholds: 0-10 safe, 11-25 caution, 26-50 critical
+                const nh3Ppb = parseFloat(feed.field8) || 10.0;
+                const nh3Ppm = nh3Ppb / 1000;
                 
                 return {
                     temperature: parseFloat(feed.field1) || 22.5,
@@ -467,11 +468,10 @@
                     lightIntensity: parseFloat(feed.field5) || 500,
                     noise: { current: parseFloat(feed.field4) || 45.0, peak: 70.0, average: 55.0 },
                     tvoc: {
-                        nh3: nh3Ppm,
-                        no2: currentNO2Value,
-                        no2Raw,
-                        h2s: 0.003,
-                        co: currentNO2Value
+                        nh3: nh3Ppm,                          // NH3 in ppm (converted from ppb)
+                        no2: currentNO2Value,                  // NO2 from field3 (ppm)
+                        h2s: 0.003,                            // H2S mock value
+                        co: delayedCOValue                     // CO with 10s delay
                     },
                     particulate: { pm25: parseFloat(feed.field6) || 15.0, pm10: parseFloat(feed.field7) || 25.0 }
                 };
@@ -484,27 +484,71 @@
         }
     }
     
-    function renderTVOCCards(tvoc) {
+    function updateTVOCDisplay() {
+        if (dashboardView !== 'monitoring') return;
+        if (sensorHistory.length === 0) return;
+        const lastData = sensorHistory[sensorHistory.length - 1].data;
+        
+        const updatedData = {
+            ...lastData,
+            tvoc: { ...lastData.tvoc, co: delayedCOValue }
+        };
+        
         const tvocSensors = [
-            { label: 'NH₃', value: tvoc.nh3, safe: 10, caution: 25, alert: 50, unit: 'ppm', decimals: 1, delay: false },
-            { label: 'NO₂', value: tvoc.no2, safe: 1, caution: 2, alert: 5, unit: 'ppm', decimals: 1, delay: false, rawValue: tvoc.no2Raw },
-            { label: 'H₂S', value: tvoc.h2s, safe: 2, caution: 5, alert: 10, unit: 'ppm', decimals: 1, delay: false },
-            { label: 'CO', value: tvoc.co, safe: 10, caution: 25, alert: 50, unit: 'ppm', decimals: 1, delay: true }
+            { label: 'NH₃', value: updatedData.tvoc.nh3, warning: 11, critical: 26, unit: 'ppm', decimals: 1, delay: false, customStatus: true },
+            { label: 'NO₂', value: updatedData.tvoc.no2, warning: 0.015, critical: 0.020, unit: 'ppm', decimals: 3, delay: false },
+            { label: 'H₂S', value: updatedData.tvoc.h2s, warning: 0.010, critical: 0.015, unit: 'ppm', decimals: 3, delay: false },
+            { label: 'CO', value: updatedData.tvoc.co, warning: 0.015, critical: 0.020, unit: 'ppm', decimals: 3, delay: true }
         ];
-
-        return tvocSensors.map(s => {
-            const status = getStatus(s.value, s.safe, s.caution, s.alert);
-            const formattedValue = s.rawValue !== undefined ? s.rawValue : s.value.toFixed(s.decimals);
-            const delayBadge = s.delay ? '<span class="delay-badge" title="20 second delay">⏱️ 20s delay</span>' : '';
+        
+        document.getElementById('tvoc-sensors').innerHTML = tvocSensors.map(s => {
+            let status;
+            if (s.customStatus) {
+                if (s.value <= 10) status = 'green';
+                else if (s.value <= 25) status = 'amber';
+                else status = 'red';
+            } else {
+                status = getStatus(s.value, s.warning, s.critical);
+            }
+            const formattedValue = s.value.toFixed(s.decimals);
+            const delayBadge = s.delay ? '<span class="delay-badge" title="10 second delay">⏱️ 10s delay</span>' : '';
             return `<div class="card"><p class="sensor-label">${s.label}${delayBadge}</p><div class="sensor-value"><span class="value-large color-${status}">${formattedValue}</span><span class="value-unit">${s.unit}</span></div><div class="status-indicator status-${status}" style="margin-top:8px"></div></div>`;
         }).join('');
     }
 
-    function updateTVOCDisplay() {
-        if (dashboardView !== 'monitoring' || sensorHistory.length === 0) return;
-        const lastData = sensorHistory[sensorHistory.length - 1].data;
-        const updatedTvoc = { ...lastData.tvoc, co: currentNO2Value };
-        document.getElementById('tvoc-sensors').innerHTML = renderTVOCCards(updatedTvoc);
+    function generateMockSensorData(nodeId) {
+        const offset = nodeId === 1 ? 0 : 3;
+        const mockNO2Value = 0.002 + (offset * 0.003) + Math.random() * 0.015;
+        currentNO2Value = mockNO2Value;
+        
+        if (pendingCOUpdate) clearTimeout(pendingCOUpdate);
+        pendingCOUpdate = setTimeout(() => {
+            delayedCOValue = currentNO2Value;
+            if (dashboardView === 'monitoring') updateTVOCDisplay();
+            pendingCOUpdate = null;
+        }, 10000);
+        
+        // Mock NH3 in ppm (0-50 range)
+        const mockNH3 = 5 + (offset * 2) + Math.random() * 30;
+        
+        return {
+            temperature: 20 + offset + Math.random() * 8,
+            humidity: 40 + offset * 2 + Math.random() * 20,
+            lightIntensity: 200 + offset * 50 + Math.random() * 800,
+            noise: { current: 40 + offset * 3 + Math.random() * 40, peak: 60 + offset * 2 + Math.random() * 30, average: 45 + offset * 2 + Math.random() * 20 },
+            tvoc: {
+                nh3: mockNH3,
+                no2: mockNO2Value,
+                h2s: 0.001 + (offset * 0.002) + Math.random() * 0.01,
+                co: delayedCOValue
+            },
+            particulate: { pm25: offset * 4 + Math.random() * 35, pm10: offset * 5 + Math.random() * 50 }
+        };
+    }
+
+    function getStatus(value, warning, critical, inverse = false) {
+        if (inverse) { if (value < critical) return 'red'; if (value < warning) return 'amber'; return 'green'; }
+        if (value > critical) return 'red'; if (value > warning) return 'amber'; return 'green';
     }
 
     function updateTimestamp() {
@@ -559,12 +603,31 @@
             </div>
         `).join('');
         
-        document.getElementById('tvoc-sensors').innerHTML = renderTVOCCards(data.tvoc);
+        // TVOC sensors - NH3 with custom thresholds
+        const tvocSensors = [
+            { label: 'NH₃', value: data.tvoc.nh3, warning: 11, critical: 26, unit: 'ppm', decimals: 1, delay: false, customStatus: true },
+            { label: 'NO₂', value: data.tvoc.no2, warning: 0.015, critical: 0.020, unit: 'ppm', decimals: 3, delay: false },
+            { label: 'H₂S', value: data.tvoc.h2s, warning: 0.010, critical: 0.015, unit: 'ppm', decimals: 3, delay: false },
+            { label: 'CO', value: data.tvoc.co, warning: 0.015, critical: 0.020, unit: 'ppm', decimals: 3, delay: true }
+        ];
+        document.getElementById('tvoc-sensors').innerHTML = tvocSensors.map(s => {
+            let status;
+            if (s.customStatus) {
+                if (s.value <= 10) status = 'green';
+                else if (s.value <= 25) status = 'amber';
+                else status = 'red';
+            } else {
+                status = getStatus(s.value, s.warning, s.critical);
+            }
+            const formattedValue = s.value.toFixed(s.decimals);
+            const delayBadge = s.delay ? '<span class="delay-badge" title="10 second delay">⏱️ 10s delay</span>' : '';
+            return `<div class="card"><p class="sensor-label">${s.label}${delayBadge}</p><div class="sensor-value"><span class="value-large color-${status}">${formattedValue}</span><span class="value-unit">${s.unit}</span></div><div class="status-indicator status-${status}" style="margin-top:8px"></div></div>`;
+        }).join('');
         
         // PM sensors
         const pmSensors = [
             { label: 'PM 2.5', value: data.particulate.pm25, warning: 25, critical: 30, unit: 'μg/m³' },
-            { label: 'PM 1', value: data.particulate.pm10, warning: 40, critical: 45, unit: 'μg/m³' }
+            { label: 'PM 10', value: data.particulate.pm10, warning: 40, critical: 45, unit: 'μg/m³' }
         ];
         document.getElementById('pm-sensors').innerHTML = pmSensors.map(s => {
             const status = getStatus(s.value, s.warning, s.critical);
@@ -617,6 +680,8 @@
     }
 
     function switchNode(nodeId) {
+        if (pendingCOUpdate) { clearTimeout(pendingCOUpdate); pendingCOUpdate = null; }
+        delayedCOValue = 0.005;
         currentNO2Value = 0.005;
         
         showMonitoringView();
@@ -661,137 +726,523 @@
         document.getElementById('monitoring-toolbar').classList.add('hidden');
         document.getElementById('production-toolbar-hint').classList.remove('hidden');
         document.querySelectorAll('.tab-node').forEach(t => t.classList.remove('active'));
-        document.querySelector('.tab-production').classList.add('active');
-        
-        if (!document.getElementById('poultryProRoot').innerHTML) {
-            document.getElementById('poultryProRoot').innerHTML = `
-                <div class="prod-container">
-                    <div class="poultry-nav">
-                        <div class="poultry-nav-item active" onclick="switchProductionTab('overview')">
-                            <i class="fas fa-chart-line"></i> Overview
-                        </div>
-                        <div class="poultry-nav-item" onclick="switchProductionTab('flocks')">
-                            <i class="fas fa-dove"></i> Flocks
-                        </div>
-                        <div class="poultry-nav-item" onclick="switchProductionTab('feed')">
-                            <i class="fas fa-seedling"></i> Feed Management
-                        </div>
-                        <div class="poultry-nav-item" onclick="switchProductionTab('health')">
-                            <i class="fas fa-heartbeat"></i> Health Monitoring
-                        </div>
-                        <div class="poultry-nav-item" onclick="switchProductionTab('reports')">
-                            <i class="fas fa-file-alt"></i> Reports
-                        </div>
-                    </div>
-                    <div id="production-content"></div>
-                </div>
-            `;
-            switchProductionTab('overview');
-        }
+        document.querySelector('.tab-production')?.classList.add('active');
+        if (typeof initPoultryPro === 'function') initPoultryPro();
     }
 
-    function switchProductionTab(tab) {
-        document.querySelectorAll('.poultry-nav-item').forEach(item => item.classList.remove('active'));
-        event.target.closest('.poultry-nav-item').classList.add('active');
-        const content = document.getElementById('production-content');
-        if (tab === 'overview') {
-            content.innerHTML = `
-                <div class="grid grid-4" style="margin-bottom: 24px;">
-                    <div class="kpi-card">
-                        <h4>Total Flocks</h4>
-                        <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">12</div>
-                    </div>
-                    <div class="kpi-card">
-                        <h4>Active Birds</h4>
-                        <div style="font-size: 32px; font-weight: 700; color: #22c55e;">45,230</div>
-                    </div>
-                    <div class="kpi-card">
-                        <h4>Egg Production</h4>
-                        <div style="font-size: 32px; font-weight: 700; color: #f59e0b;">8,450</div>
-                    </div>
-                    <div class="kpi-card">
-                        <h4>Feed Consumption</h4>
-                        <div style="font-size: 32px; font-weight: 700; color: #8b5cf6;">2.3 tons</div>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <h4>Production Trends</h4>
-                    <canvas id="productionChart" style="height: 200px;"></canvas>
-                </div>
-            `;
-            const ctx = document.getElementById('productionChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Eggs Produced',
-                        data: [7500, 7800, 8200, 8100, 8400, 8450],
-                        borderColor: '#3b82f6',
-                        tension: 0.2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { labels: { color: '#94a3b8' } } },
-                    scales: { x: { ticks: { color: '#64748b' } }, y: { ticks: { color: '#64748b' } } }
-                }
-            });
-        } else if (tab === 'flocks') {
-            content.innerHTML = `
-                <div style="margin-bottom: 16px;">
-                    <button class="btn-prod" onclick="openAddFlockModal()">+ Add New Flock</button>
-                </div>
-                <div class="prod-table-container">
-                    <table class="prod-table">
-                        <thead>
-                            <tr>
-                                <th>Flock ID</th>
-                                <th>Breed</th>
-                                <th>Age (weeks)</th>
-                                <th>Count</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>FLK-001</td>
-                                <td>Rhode Island Red</td>
-                                <td>8</td>
-                                <td>500</td>
-                                <td><span class="status-badge status-online">Active</span></td>
-                                <td><button class="btn-prod" style="padding: 4px 8px; font-size: 12px;">Edit</button></td>
-                            </tr>
-                            <tr>
-                                <td>FLK-002</td>
-                                <td>Leghorn</td>
-                                <td>12</td>
-                                <td>450</td>
-                                <td><span class="status-badge status-online">Active</span></td>
-                                <td><button class="btn-prod" style="padding: 4px 8px; font-size: 12px;">Edit</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
+    function toggleDateInputs() {
+        const dateInputs = document.getElementById('dateInputs');
+        document.getElementById('timeRange').value === 'custom' ? dateInputs.classList.add('show') : dateInputs.classList.remove('show');
+    }
+
+    async function toggleRecording() {
+        if (!isRecording) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                let chunks = [];
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `recording-${Date.now()}.webm`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                const btn = document.getElementById('recordBtn');
+                btn.classList.add('recording');
+                btn.innerHTML = '⏹️ Stop Recording';
+            } catch(e) { alert('Microphone access denied'); }
         } else {
-            content.innerHTML = `<div style="text-align: center; padding: 40px; color: #94a3b8;">${tab.charAt(0).toUpperCase() + tab.slice(1)} module coming soon...</div>`;
+            mediaRecorder?.stop();
+            isRecording = false;
+            const btn = document.getElementById('recordBtn');
+            btn.classList.remove('recording');
+            btn.innerHTML = '🎤 Record Audio';
         }
     }
 
-    function openAddFlockModal() {
-        // Placeholder for modal
-        alert('Add Flock modal would open here.');
+    function downloadCSV() {
+        if (sensorHistory.length === 0) { alert('No data yet'); return; }
+        let csv = 'Timestamp,Node,Sensor,Value,Unit,Status\n';
+        sensorHistory.forEach(r => {
+            const d = r.data;
+            let nh3Status = 'green';
+            if (d.tvoc.nh3 > 25) nh3Status = 'red';
+            else if (d.tvoc.nh3 > 10) nh3Status = 'amber';
+            
+            csv += `${r.timestamp.toISOString()},${r.node},Temperature,${d.temperature.toFixed(1)},°C,${getStatus(d.temperature, 26, 30)}\n`;
+            csv += `${r.timestamp.toISOString()},${r.node},Humidity,${d.humidity.toFixed(1)},%,${getStatus(d.humidity, 55, 65)}\n`;
+            csv += `${r.timestamp.toISOString()},${r.node},NH3,${d.tvoc.nh3.toFixed(1)},ppm,${nh3Status}\n`;
+            csv += `${r.timestamp.toISOString()},${r.node},NO2,${d.tvoc.no2.toFixed(3)},ppm,${getStatus(d.tvoc.no2, 0.015, 0.020)}\n`;
+            csv += `${r.timestamp.toISOString()},${r.node},H2S,${d.tvoc.h2s.toFixed(3)},ppm,${getStatus(d.tvoc.h2s, 0.010, 0.015)}\n`;
+            csv += `${r.timestamp.toISOString()},${r.node},CO,${d.tvoc.co.toFixed(3)},ppm,${getStatus(d.tvoc.co, 0.015, 0.020)}\n`;
+            csv += `${r.timestamp.toISOString()},${r.node},PM2.5,${d.particulate.pm25.toFixed(1)},μg/m³,${getStatus(d.particulate.pm25, 25, 30)}\n`;
+            csv += `${r.timestamp.toISOString()},${r.node},PM10,${d.particulate.pm10.toFixed(1)},μg/m³,${getStatus(d.particulate.pm10, 40, 45)}\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `sensor-data-${Date.now()}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
     }
 
-    // Initial setup
+    // ========== POULTRY PRO SYSTEM (Compact - Same as before) ==========
+    let poultryBatches = [];
+    let poultryInventory = [];
+    let poultrySales = [];
+    
+    let salesChartInstance = null;
+    let batchChartInstance = null;
+    let revenueChartInstance = null;
+    let performanceChartInstance = null;
+
+    function destroyChart(chart) { if (chart && typeof chart.destroy === 'function') chart.destroy(); }
+
+    function loadPoultryData() {
+        const storedBatches = localStorage.getItem('poultry_batches');
+        const storedInventory = localStorage.getItem('poultry_inventory');
+        const storedSales = localStorage.getItem('poultry_sales');
+        
+        poultryBatches = storedBatches ? JSON.parse(storedBatches) : [
+            { id: 'batch_1', name: 'Batch A', birds: 500, age: 4, breed: 'Cobb 500', status: 'Active', startDate: '2024-01-15' },
+            { id: 'batch_2', name: 'Batch B', birds: 700, age: 2, breed: 'Ross 308', status: 'Active', startDate: '2024-02-01' },
+            { id: 'batch_3', name: 'Batch C', birds: 0, age: 8, breed: 'Layer', status: 'Harvested', startDate: '2023-12-01' }
+        ];
+        
+        poultryInventory = storedInventory ? JSON.parse(storedInventory) : [
+            { id: 'inv_1', name: 'Broiler Starter Feed', category: 'Feed', quantity: 200, unit: 'kg', status: 'Available', cost: 25000 },
+            { id: 'inv_2', name: 'Antibiotics', category: 'Drugs', quantity: 50, unit: 'units', status: 'Low', cost: 15000 },
+            { id: 'inv_3', name: 'Vitamin Premix', category: 'Supplements', quantity: 120, unit: 'doses', status: 'Available', cost: 8000 }
+        ];
+        
+        poultrySales = storedSales ? JSON.parse(storedSales) : [
+            { id: 'sale_1', batchId: 'batch_1', date: '2024-02-10', quantity: 100, unitPrice: 3500, buyer: 'Local Market', type: 'Live Bird' },
+            { id: 'sale_2', batchId: 'batch_2', date: '2024-02-15', quantity: 50, unitPrice: 3800, buyer: 'Restaurant', type: 'Dressed' }
+        ];
+    }
+
+    function saveAllData() {
+        localStorage.setItem('poultry_batches', JSON.stringify(poultryBatches));
+        localStorage.setItem('poultry_inventory', JSON.stringify(poultryInventory));
+        localStorage.setItem('poultry_sales', JSON.stringify(poultrySales));
+    }
+
+    function generateId(prefix) { return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6); }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+
+    function showModal(title, formHtml, onSave) {
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'modal-overlay';
+        modalDiv.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header"><h3>${title}</h3><button class="modal-close">&times;</button></div>
+                <div class="modal-body">${formHtml}</div>
+                <div class="modal-footer"><button class="btn-cancel">Cancel</button><button class="btn-save">Save</button></div>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+        const close = () => modalDiv.remove();
+        modalDiv.querySelector('.modal-close')?.addEventListener('click', close);
+        modalDiv.querySelector('.btn-cancel')?.addEventListener('click', close);
+        modalDiv.querySelector('.btn-save')?.addEventListener('click', () => { onSave(modalDiv); close(); });
+        modalDiv.addEventListener('click', e => { if (e.target === modalDiv) close(); });
+    }
+
+    function createFormField(label, inputHtml) {
+        return `<div class="mb-4"><label class="form-label">${label}</label>${inputHtml}</div>`;
+    }
+
+    function createInput(type, id, placeholder, value = '') {
+        return `<input type="${type}" id="${id}" class="form-input" placeholder="${placeholder}" value="${escapeHtml(value)}">`;
+    }
+
+    function createSelect(id, options, selectedValue = '') {
+        let optionsHtml = '';
+        options.forEach(opt => {
+            const selected = opt.value === selectedValue ? 'selected' : '';
+            optionsHtml += `<option value="${opt.value}" ${selected}>${opt.label}</option>`;
+        });
+        return `<select id="${id}" class="form-select">${optionsHtml}</select>`;
+    }
+
+    // Dashboard
+    function renderDashboard() {
+        const totalBirds = poultryBatches.filter(b => b.status === 'Active').reduce((sum, b) => sum + b.birds, 0);
+        const totalRevenue = poultrySales.reduce((sum, s) => sum + (s.quantity * s.unitPrice), 0);
+        const totalInventoryValue = poultryInventory.reduce((sum, i) => sum + (i.cost || 0), 0);
+        
+        const html = `
+            <div class="prod-container">
+                <h2 class="text-xl font-bold mb-4"><i class="fas fa-tachometer-alt mr-2"></i>Farm Dashboard</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="kpi-card"><p class="text-gray-400 text-sm">Active Birds</p><p class="text-2xl font-bold text-blue-400">${totalBirds}</p></div>
+                    <div class="kpi-card"><p class="text-gray-400 text-sm">Active Batches</p><p class="text-2xl font-bold text-green-400">${poultryBatches.filter(b => b.status === 'Active').length}</p></div>
+                    <div class="kpi-card"><p class="text-gray-400 text-sm">Total Revenue</p><p class="text-2xl font-bold text-purple-400">₦${totalRevenue.toLocaleString()}</p></div>
+                    <div class="kpi-card"><p class="text-gray-400 text-sm">Inventory Value</p><p class="text-2xl font-bold text-orange-400">₦${totalInventoryValue.toLocaleString()}</p></div>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                    <div class="chart-container"><canvas id="salesChart"></canvas></div>
+                    <div class="chart-container"><canvas id="batchChart"></canvas></div>
+                </div>
+                <div class="kpi-card"><h3 class="font-semibold mb-3">Recent Sales</h3><div id="recentSalesList" class="space-y-2"></div></div>
+            </div>
+        `;
+        document.getElementById('poultryPageContent').innerHTML = html;
+        
+        const salesCtx = document.getElementById('salesChart')?.getContext('2d');
+        if (salesCtx) {
+            destroyChart(salesChartInstance);
+            const salesByBatch = {};
+            poultrySales.forEach(s => { salesByBatch[s.batchId] = (salesByBatch[s.batchId] || 0) + (s.quantity * s.unitPrice); });
+            salesChartInstance = new Chart(salesCtx, {
+                type: 'bar',
+                data: { labels: Object.keys(salesByBatch).map(id => poultryBatches.find(b => b.id === id)?.name || id), datasets: [{ label: 'Revenue (₦)', data: Object.values(salesByBatch), backgroundColor: '#3b82f6', borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } } }
+            });
+        }
+        
+        const batchCtx = document.getElementById('batchChart')?.getContext('2d');
+        if (batchCtx) {
+            destroyChart(batchChartInstance);
+            batchChartInstance = new Chart(batchCtx, {
+                type: 'doughnut',
+                data: { labels: poultryBatches.map(b => b.name), datasets: [{ data: poultryBatches.map(b => b.birds), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'] }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#94a3b8' } } } }
+            });
+        }
+        
+        const recentSales = [...poultrySales].reverse().slice(0, 5);
+        document.getElementById('recentSalesList').innerHTML = recentSales.map(s => `
+            <div class="flex justify-between items-center p-2 bg-gray-800 rounded">
+                <span><strong>${poultryBatches.find(b => b.id === s.batchId)?.name || s.batchId}</strong> - ${s.quantity} birds @ ₦${s.unitPrice}</span>
+                <span class="font-semibold">₦${(s.quantity * s.unitPrice).toLocaleString()}</span>
+                <span class="text-sm text-gray-400">${s.date}</span>
+            </div>
+        `).join('');
+    }
+
+    // Analytics
+    function renderAnalytics() {
+        const totalBirds = poultryBatches.filter(b => b.status === 'Active').reduce((sum, b) => sum + b.birds, 0);
+        const totalRevenue = poultrySales.reduce((sum, s) => sum + (s.quantity * s.unitPrice), 0);
+        const totalInventory = poultryInventory.reduce((sum, i) => sum + (i.cost || 0), 0);
+        const profit = totalRevenue - totalInventory;
+        
+        const html = `
+            <div class="prod-container">
+                <h2 class="text-xl font-bold mb-4"><i class="fas fa-chart-line mr-2"></i>Analytics & Reports</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="kpi-card"><p class="text-gray-400">Total Birds</p><p class="text-2xl font-bold">${totalBirds}</p></div>
+                    <div class="kpi-card"><p class="text-gray-400">Total Revenue</p><p class="text-2xl font-bold text-green-400">₦${totalRevenue.toLocaleString()}</p></div>
+                    <div class="kpi-card"><p class="text-gray-400">Total Costs</p><p class="text-2xl font-bold text-red-400">₦${totalInventory.toLocaleString()}</p></div>
+                    <div class="kpi-card"><p class="text-gray-400">Net Profit</p><p class="text-2xl font-bold text-blue-400">₦${profit.toLocaleString()}</p></div>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                    <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                    <div class="chart-container"><canvas id="performanceChart"></canvas></div>
+                </div>
+                <div class="kpi-card"><h3 class="font-semibold mb-3">Top Performing Batches</h3><div id="topBatches"></div></div>
+            </div>
+        `;
+        document.getElementById('poultryPageContent').innerHTML = html;
+        
+        const revenueCtx = document.getElementById('revenueChart')?.getContext('2d');
+        if (revenueCtx) {
+            destroyChart(revenueChartInstance);
+            const monthlyRevenue = {};
+            poultrySales.forEach(s => { const month = s.date.substring(0, 7); monthlyRevenue[month] = (monthlyRevenue[month] || 0) + (s.quantity * s.unitPrice); });
+            revenueChartInstance = new Chart(revenueCtx, {
+                type: 'line',
+                data: { labels: Object.keys(monthlyRevenue), datasets: [{ label: 'Revenue (₦)', data: Object.values(monthlyRevenue), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.3 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } } }
+            });
+        }
+        
+        const perfCtx = document.getElementById('performanceChart')?.getContext('2d');
+        if (perfCtx) {
+            destroyChart(performanceChartInstance);
+            const batchRevenue = {};
+            poultrySales.forEach(s => { batchRevenue[s.batchId] = (batchRevenue[s.batchId] || 0) + (s.quantity * s.unitPrice); });
+            performanceChartInstance = new Chart(perfCtx, {
+                type: 'bar',
+                data: { labels: Object.keys(batchRevenue).map(id => poultryBatches.find(b => b.id === id)?.name || id), datasets: [{ label: 'Revenue (₦)', data: Object.values(batchRevenue), backgroundColor: '#10b981', borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } } }
+            });
+        }
+        
+        const topBatches = Object.entries(poultrySales.reduce((acc, s) => { acc[s.batchId] = (acc[s.batchId] || 0) + (s.quantity * s.unitPrice); return acc; }, {})).sort((a,b) => b[1] - a[1]).slice(0, 3);
+        document.getElementById('topBatches').innerHTML = topBatches.map(([id, rev]) => `<div class="flex justify-between p-2 bg-gray-800 rounded mb-2"><span>${poultryBatches.find(b => b.id === id)?.name || id}</span><span class="font-semibold">₦${rev.toLocaleString()}</span></div>`).join('');
+    }
+
+    // Batches CRUD
+    function renderBatches() {
+        const html = `
+            <div class="prod-container">
+                <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold"><i class="fas fa-layer-group mr-2"></i>Batch Management</h2><button id="addBatchBtn" class="btn-prod"><i class="fas fa-plus mr-2"></i>New Batch</button></div>
+                <div class="overflow-x-auto"><table class="prod-table w-full"><thead><tr><th>Name</th><th>Birds</th><th>Age</th><th>Breed</th><th>Start Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="batchesTable"></tbody></table></div>
+            </div>
+        `;
+        document.getElementById('poultryPageContent').innerHTML = html;
+        renderBatchesTable();
+        document.getElementById('addBatchBtn')?.addEventListener('click', showAddBatchModal);
+    }
+
+    function renderBatchesTable() {
+        const tbody = document.getElementById('batchesTable');
+        tbody.innerHTML = poultryBatches.map(b => `
+            <tr><td class="font-medium">${escapeHtml(b.name)}</td>
+            <td>${b.birds}</td>
+            <td>${b.age} wks</td>
+            <td>${escapeHtml(b.breed)}</td>
+            <td>${b.startDate || '-'}</td>
+            <td><span class="px-2 py-1 rounded-full text-xs ${b.status === 'Active' ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'}">${b.status}</span></td>
+            <td><button class="editBatch text-blue-400 mr-2" data-id="${b.id}"><i class="fas fa-edit"></i></button><button class="deleteBatch text-red-400" data-id="${b.id}"><i class="fas fa-trash"></i></button></td>
+        `).join('');
+        document.querySelectorAll('.editBatch').forEach(btn => btn.addEventListener('click', () => editBatch(btn.dataset.id)));
+        document.querySelectorAll('.deleteBatch').forEach(btn => btn.addEventListener('click', () => { if(confirm('Delete batch?')) { poultryBatches = poultryBatches.filter(b => b.id !== btn.dataset.id); saveAllData(); renderBatches(); } }));
+    }
+
+    function showAddBatchModal() {
+        const formHtml = `
+            ${createFormField('Batch Name', createInput('text', 'name', 'e.g., Batch D'))}
+            ${createFormField('Number of Birds', createInput('number', 'birds', '', '0'))}
+            ${createFormField('Age (weeks)', createInput('number', 'age', '', '1'))}
+            ${createFormField('Breed', createInput('text', 'breed', 'e.g., Cobb 500'))}
+            ${createFormField('Start Date', createInput('date', 'startDate'))}
+            ${createFormField('Status', createSelect('status', [{value:'Active', label:'Active'}, {value:'Harvested', label:'Harvested'}]))}
+        `;
+        showModal('Add New Batch', formHtml, (modal) => {
+            poultryBatches.push({ id: generateId('batch'), name: modal.querySelector('#name').value, birds: parseInt(modal.querySelector('#birds').value) || 0, age: parseInt(modal.querySelector('#age').value) || 0, breed: modal.querySelector('#breed').value, startDate: modal.querySelector('#startDate').value, status: modal.querySelector('#status').value });
+            saveAllData();
+            renderBatches();
+        });
+    }
+
+    function editBatch(id) {
+        const batch = poultryBatches.find(b => b.id === id);
+        if (!batch) return;
+        const formHtml = `
+            ${createFormField('Batch Name', createInput('text', 'name', '', batch.name))}
+            ${createFormField('Number of Birds', createInput('number', 'birds', '', batch.birds.toString()))}
+            ${createFormField('Age (weeks)', createInput('number', 'age', '', batch.age.toString()))}
+            ${createFormField('Breed', createInput('text', 'breed', '', batch.breed))}
+            ${createFormField('Start Date', createInput('date', 'startDate', '', batch.startDate || ''))}
+            ${createFormField('Status', createSelect('status', [{value:'Active', label:'Active'}, {value:'Harvested', label:'Harvested'}], batch.status))}
+        `;
+        showModal('Edit Batch', formHtml, (modal) => {
+            batch.name = modal.querySelector('#name').value;
+            batch.birds = parseInt(modal.querySelector('#birds').value) || 0;
+            batch.age = parseInt(modal.querySelector('#age').value) || 0;
+            batch.breed = modal.querySelector('#breed').value;
+            batch.startDate = modal.querySelector('#startDate').value;
+            batch.status = modal.querySelector('#status').value;
+            saveAllData();
+            renderBatches();
+        });
+    }
+
+    // Inventory CRUD
+    function renderInventory() {
+        const html = `
+            <div class="prod-container">
+                <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold"><i class="fas fa-warehouse mr-2"></i>Inventory</h2><button id="addInventoryBtn" class="btn-prod"><i class="fas fa-plus mr-2"></i>Add Item</button></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="kpi-card"><p class="text-gray-400">Total Items</p><p class="text-2xl font-bold">${poultryInventory.length}</p></div>
+                    <div class="kpi-card"><p class="text-gray-400">Low Stock</p><p class="text-2xl font-bold text-red-400">${poultryInventory.filter(i => i.status === 'Low').length}</p></div>
+                    <div class="kpi-card"><p class="text-gray-400">Total Value</p><p class="text-2xl font-bold">₦${poultryInventory.reduce((s,i)=>s+(i.cost||0),0).toLocaleString()}</p></div>
+                </div>
+                <div class="overflow-x-auto"><table class="prod-table w-full"><thead><tr><th>Item</th><th>Category</th><th>Quantity</th><th>Unit</th><th>Cost (₦)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="inventoryTable"></tbody></table></div>
+            </div>
+        `;
+        document.getElementById('poultryPageContent').innerHTML = html;
+        renderInventoryTable();
+        document.getElementById('addInventoryBtn')?.addEventListener('click', showAddInventoryModal);
+    }
+
+    function renderInventoryTable() {
+        const tbody = document.getElementById('inventoryTable');
+        tbody.innerHTML = poultryInventory.map(i => `
+            <tr><td class="font-medium">${escapeHtml(i.name)}</td>
+            <td>${escapeHtml(i.category)}</td>
+            <td>${i.quantity}</td>
+            <td>${escapeHtml(i.unit)}</td>
+            <td>₦${(i.cost || 0).toLocaleString()}</td>
+            <td><span class="px-2 py-1 rounded-full text-xs ${i.status === 'Low' ? 'bg-red-900 text-red-300' : 'bg-green-900 text-green-300'}">${i.status}</span></td>
+            <td><button class="editInv text-blue-400 mr-2" data-id="${i.id}"><i class="fas fa-edit"></i></button><button class="deleteInv text-red-400" data-id="${i.id}"><i class="fas fa-trash"></i></button></td>
+        `).join('');
+        document.querySelectorAll('.editInv').forEach(btn => btn.addEventListener('click', () => editInventory(btn.dataset.id)));
+        document.querySelectorAll('.deleteInv').forEach(btn => btn.addEventListener('click', () => { if(confirm('Delete item?')) { poultryInventory = poultryInventory.filter(i => i.id !== btn.dataset.id); saveAllData(); renderInventory(); } }));
+    }
+
+    function showAddInventoryModal() {
+        const formHtml = `
+            ${createFormField('Item Name', createInput('text', 'name', 'e.g., Broiler Feed'))}
+            ${createFormField('Category', createInput('text', 'category', 'Feed / Drugs / Equipment'))}
+            ${createFormField('Quantity', createInput('number', 'quantity', '', '0'))}
+            ${createFormField('Unit', createInput('text', 'unit', 'kg, units, doses'))}
+            ${createFormField('Cost (₦)', createInput('number', 'cost', '', '0'))}
+            ${createFormField('Status', createSelect('status', [{value:'Available', label:'Available'}, {value:'Low', label:'Low'}]))}
+        `;
+        showModal('Add Inventory Item', formHtml, (modal) => {
+            poultryInventory.push({ id: generateId('inv'), name: modal.querySelector('#name').value, category: modal.querySelector('#category').value, quantity: parseInt(modal.querySelector('#quantity').value) || 0, unit: modal.querySelector('#unit').value, cost: parseInt(modal.querySelector('#cost').value) || 0, status: modal.querySelector('#status').value });
+            saveAllData();
+            renderInventory();
+        });
+    }
+
+    function editInventory(id) {
+        const item = poultryInventory.find(i => i.id === id);
+        if (!item) return;
+        const formHtml = `
+            ${createFormField('Item Name', createInput('text', 'name', '', item.name))}
+            ${createFormField('Category', createInput('text', 'category', '', item.category))}
+            ${createFormField('Quantity', createInput('number', 'quantity', '', item.quantity.toString()))}
+            ${createFormField('Unit', createInput('text', 'unit', '', item.unit))}
+            ${createFormField('Cost (₦)', createInput('number', 'cost', '', (item.cost || 0).toString()))}
+            ${createFormField('Status', createSelect('status', [{value:'Available', label:'Available'}, {value:'Low', label:'Low'}], item.status))}
+        `;
+        showModal('Edit Inventory Item', formHtml, (modal) => {
+            item.name = modal.querySelector('#name').value;
+            item.category = modal.querySelector('#category').value;
+            item.quantity = parseInt(modal.querySelector('#quantity').value) || 0;
+            item.unit = modal.querySelector('#unit').value;
+            item.cost = parseInt(modal.querySelector('#cost').value) || 0;
+            item.status = modal.querySelector('#status').value;
+            saveAllData();
+            renderInventory();
+        });
+    }
+
+    // Sales CRUD
+    function renderSales() {
+        const totalRevenue = poultrySales.reduce((sum, s) => sum + (s.quantity * s.unitPrice), 0);
+        const html = `
+            <div class="prod-container">
+                <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold"><i class="fas fa-chart-line mr-2"></i>Sales Records</h2><button id="addSaleBtn" class="btn-prod"><i class="fas fa-plus mr-2"></i>Record Sale</button></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"><div class="kpi-card"><p class="text-gray-400">Total Sales</p><p class="text-2xl font-bold">${poultrySales.length}</p></div><div class="kpi-card"><p class="text-gray-400">Total Revenue</p><p class="text-2xl font-bold text-green-400">₦${totalRevenue.toLocaleString()}</p></div></div>
+                <div class="overflow-x-auto"><table class="prod-table w-full"><thead><tr><th>Date</th><th>Batch</th><th>Type</th><th>Quantity</th><th>Unit Price</th><th>Total</th><th>Buyer</th><th>Actions</th><tr></thead><tbody id="salesTable"></tbody></table></div>
+            </div>
+        `;
+        document.getElementById('poultryPageContent').innerHTML = html;
+        renderSalesTable();
+        document.getElementById('addSaleBtn')?.addEventListener('click', showAddSaleModal);
+    }
+
+    function renderSalesTable() {
+        const tbody = document.getElementById('salesTable');
+        tbody.innerHTML = poultrySales.map(s => {
+            const batch = poultryBatches.find(b => b.id === s.batchId);
+            return `<tr><td class="whitespace-nowrap">${s.date}</td>
+                    <td>${batch?.name || s.batchId}</td>
+                    <td>${escapeHtml(s.type)}</td>
+                    <td>${s.quantity}</td>
+                    <td>₦${s.unitPrice.toLocaleString()}</td>
+                    <td class="font-semibold">₦${(s.quantity * s.unitPrice).toLocaleString()}</td>
+                    <td>${escapeHtml(s.buyer)}</td>
+                    <td><button class="editSale text-blue-400 mr-2" data-id="${s.id}"><i class="fas fa-edit"></i></button><button class="deleteSale text-red-400" data-id="${s.id}"><i class="fas fa-trash"></i></button></td>
+                </tr>`;
+        }).join('');
+        document.querySelectorAll('.editSale').forEach(btn => btn.addEventListener('click', () => editSale(btn.dataset.id)));
+        document.querySelectorAll('.deleteSale').forEach(btn => btn.addEventListener('click', () => { if(confirm('Delete sale?')) { poultrySales = poultrySales.filter(s => s.id !== btn.dataset.id); saveAllData(); renderSales(); } }));
+    }
+
+    function showAddSaleModal() {
+        const batchOptions = poultryBatches.filter(b => b.status === 'Active').map(b => ({value: b.id, label: b.name}));
+        const formHtml = `
+            ${createFormField('Date', createInput('date', 'date', '', new Date().toISOString().split('T')[0]))}
+            ${createFormField('Batch', createSelect('batchId', batchOptions))}
+            ${createFormField('Type', createInput('text', 'type', 'Live Bird / Dressed'))}
+            ${createFormField('Quantity', createInput('number', 'quantity', '', '0'))}
+            ${createFormField('Unit Price (₦)', createInput('number', 'unitPrice', '', '0'))}
+            ${createFormField('Buyer', createInput('text', 'buyer', 'Customer name'))}
+        `;
+        showModal('Record Sale', formHtml, (modal) => {
+            poultrySales.push({ id: generateId('sale'), date: modal.querySelector('#date').value, batchId: modal.querySelector('#batchId').value, type: modal.querySelector('#type').value, quantity: parseInt(modal.querySelector('#quantity').value) || 0, unitPrice: parseInt(modal.querySelector('#unitPrice').value) || 0, buyer: modal.querySelector('#buyer').value });
+            saveAllData();
+            renderSales();
+        });
+    }
+
+    function editSale(id) {
+        const sale = poultrySales.find(s => s.id === id);
+        if (!sale) return;
+        const batchOptions = poultryBatches.map(b => ({value: b.id, label: b.name}));
+        const formHtml = `
+            ${createFormField('Date', createInput('date', 'date', '', sale.date))}
+            ${createFormField('Batch', createSelect('batchId', batchOptions, sale.batchId))}
+            ${createFormField('Type', createInput('text', 'type', '', sale.type))}
+            ${createFormField('Quantity', createInput('number', 'quantity', '', sale.quantity.toString()))}
+            ${createFormField('Unit Price (₦)', createInput('number', 'unitPrice', '', sale.unitPrice.toString()))}
+            ${createFormField('Buyer', createInput('text', 'buyer', '', sale.buyer))}
+        `;
+        showModal('Edit Sale', formHtml, (modal) => {
+            sale.date = modal.querySelector('#date').value;
+            sale.batchId = modal.querySelector('#batchId').value;
+            sale.type = modal.querySelector('#type').value;
+            sale.quantity = parseInt(modal.querySelector('#quantity').value) || 0;
+            sale.unitPrice = parseInt(modal.querySelector('#unitPrice').value) || 0;
+            sale.buyer = modal.querySelector('#buyer').value;
+            saveAllData();
+            renderSales();
+        });
+    }
+
+    // Navigation
+    let currentPoultryPage = 'dashboard';
+    function switchPoultryPage(page) {
+        currentPoultryPage = page;
+        if (page === 'dashboard') renderDashboard();
+        else if (page === 'batches') renderBatches();
+        else if (page === 'inventory') renderInventory();
+        else if (page === 'sales') renderSales();
+        else if (page === 'analytics') renderAnalytics();
+        
+        document.querySelectorAll('.poultry-nav-item').forEach(link => {
+            link.classList.toggle('active', link.dataset.page === page);
+        });
+    }
+
+    function initPoultryPro() {
+        loadPoultryData();
+        const rootHtml = `
+            <div class="flex flex-col md:flex-row gap-4 min-h-[500px]">
+                <div class="md:w-64 poultry-nav">
+                    <div class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-700">
+                        <i class="fas fa-egg text-blue-400 text-xl"></i>
+                        <h2 class="text-lg font-bold text-white">Poultry Pro</h2>
+                    </div>
+                    <nav class="space-y-1">
+                        <div data-page="dashboard" class="poultry-nav-item"><i class="fas fa-tachometer-alt w-5"></i>Dashboard</div>
+                        <div data-page="batches" class="poultry-nav-item"><i class="fas fa-layer-group w-5"></i>Batches</div>
+                        <div data-page="inventory" class="poultry-nav-item"><i class="fas fa-warehouse w-5"></i>Inventory</div>
+                        <div data-page="sales" class="poultry-nav-item"><i class="fas fa-chart-line w-5"></i>Sales</div>
+                        <div data-page="analytics" class="poultry-nav-item"><i class="fas fa-chart-pie w-5"></i>Analytics</div>
+                    </nav>
+                    <div class="mt-4 pt-3 border-t border-gray-700 text-xs text-gray-500"><i class="fas fa-database mr-1"></i>Data saved locally</div>
+                </div>
+                <div class="flex-1" id="poultryPageContent"></div>
+            </div>
+        `;
+        document.getElementById('poultryProRoot').innerHTML = rootHtml;
+        document.querySelectorAll('.poultry-nav-item').forEach(link => {
+            link.addEventListener('click', () => switchPoultryPage(link.dataset.page));
+        });
+        switchPoultryPage('dashboard');
+    }
+
+    // Initialize
     initCharts();
+    updateConnectionStatusDisplay(false, null);
     updateSensors();
-    setInterval(() => {
-        if (dashboardView === 'monitoring') updateSensors();
-    }, 15000);
-    setInterval(addEvent, 5000);
+    setInterval(updateSensors, 5000);
+    setInterval(addEvent, 8000);
 </script>
 </body>
 </html>
