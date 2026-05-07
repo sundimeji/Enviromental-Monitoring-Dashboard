@@ -2,16 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Environmental Monitoring Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Environmental Monitoring + Poultry Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -20,18 +17,8 @@
             min-height: 100vh;
             padding: 16px;
         }
-
-        @media (min-width: 768px) {
-            body {
-                padding: 24px;
-            }
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
+        @media (min-width: 768px) { body { padding: 24px; } }
+        .container { max-width: 1600px; margin: 0 auto; }
         .header {
             display: flex;
             flex-direction: column;
@@ -43,938 +30,271 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         @media (min-width: 768px) {
-            .header {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 24px;
-                padding: 20px;
-            }
+            .header { flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 24px; padding: 20px; }
         }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .header-left { display: flex; align-items: center; gap: 12px; }
         .icon-box {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 40px; height: 40px; border-radius: 8px;
             background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
             font-size: 20px;
         }
-
-        h1 {
-            font-size: 20px;
-            font-weight: 600;
-            letter-spacing: -0.025em;
-            color: #ffffff;
-        }
-
-        @media (min-width: 768px) {
-            h1 {
-                font-size: 24px;
-            }
-        }
-
-        .subtitle {
-            color: #94a3b8;
-            font-size: 13px;
-        }
-
-        @media (min-width: 768px) {
-            .subtitle {
-                font-size: 14px;
-            }
-        }
-
+        h1 { font-size: 20px; font-weight: 600; color: #ffffff; }
+        @media (min-width: 768px) { h1 { font-size: 24px; } }
+        .subtitle { color: #94a3b8; font-size: 13px; }
         .status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(34, 197, 94, 0.1);
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(34, 197, 94, 0.2);
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(34, 197, 94, 0.1); padding: 8px 16px;
+            border-radius: 20px; border: 1px solid rgba(34, 197, 94, 0.2);
         }
-
         .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+            width: 8px; height: 8px; border-radius: 50%;
             background-color: #22c55e;
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
         }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 4px;
-            border-radius: 8px;
+            display: flex; gap: 8px; margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.03); padding: 4px; border-radius: 8px;
+            flex-wrap: wrap;
         }
-
         .tab {
-            padding: 10px 16px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #94a3b8;
-            font-size: 14px;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.3s;
-            flex: 1;
-            position: relative;
+            padding: 10px 16px; background: none; border: none; cursor: pointer;
+            color: #94a3b8; font-size: 14px; border-radius: 6px;
+            font-weight: 500; transition: all 0.3s;
         }
-
-        @media (min-width: 640px) {
-            .tab {
-                padding: 12px 24px;
-                font-size: 16px;
-                flex: initial;
-            }
-        }
-
-        .tab:hover {
-            color: #f1f5f9;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .tab.active {
-            color: #ffffff;
-            background: rgba(59, 130, 246, 0.2);
-            border-bottom: 2px solid #3b82f6;
-        }
-
-        .grid {
-            display: grid;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        @media (min-width: 768px) {
-            .grid {
-                gap: 16px;
-                margin-bottom: 24px;
-            }
-        }
-
-        .grid-4 {
-            grid-template-columns: 1fr;
-        }
-
-        .grid-2 {
-            grid-template-columns: 1fr;
-        }
-
-        @media (min-width: 640px) {
-            .grid-4 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .grid-2 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .grid-4 {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
+        @media (min-width: 640px) { .tab { padding: 12px 24px; font-size: 16px; } }
+        .tab:hover { color: #f1f5f9; background: rgba(255, 255, 255, 0.05); }
+        .tab.active { color: #ffffff; background: rgba(59, 130, 246, 0.2); border-bottom: 2px solid #3b82f6; }
+        .grid { display: grid; gap: 12px; margin-bottom: 16px; }
+        @media (min-width: 768px) { .grid { gap: 16px; margin-bottom: 24px; } }
+        .grid-4 { grid-template-columns: 1fr; }
+        .grid-2 { grid-template-columns: 1fr; }
+        @media (min-width: 640px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } .grid-2 { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
         .card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            backdrop-filter: blur(5px);
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px; padding: 20px; backdrop-filter: blur(5px);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            transform: translateZ(0);
         }
+        .card:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); }
+        .sensor-icon { padding: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 20px; display: inline-block; }
+        .status-indicator { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .status-green { background-color: #22c55e; }
+        .status-amber { background-color: #f59e0b; }
+        .status-red { background-color: #ef4444; }
+        .status-orange { background-color: #f97316; }
+        .color-orange { color: #f97316; }
 
-        .card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px) translateZ(0);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: start;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .sensor-icon {
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            font-size: 20px;
-        }
-
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .status-green {
-            background-color: #22c55e;
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
-        }
-        .status-amber {
-            background-color: #f59e0b;
-            box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
-        }
-        .status-red {
-            background-color: #ef4444;
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
-        }
-
-        .sensor-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #94a3b8;
-            margin-bottom: 4px;
-            font-weight: 600;
-        }
-
-        .sensor-value {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-
-        .value-large {
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        @media (min-width: 640px) {
-            .value-large {
-                font-size: 36px;
-            }
-        }
-
-        .value-unit {
-            color: #64748b;
-            font-weight: 500;
-        }
-
+        .sensor-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 600; margin-bottom: 8px; }
+        .sensor-value { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .value-large { font-size: 28px; font-weight: 700; }
+        @media (min-width: 640px) { .value-large { font-size: 36px; } }
+        .value-unit { color: #64748b; }
         .color-green { color: #22c55e; }
         .color-amber { color: #f59e0b; }
         .color-red { color: #ef4444; }
-
-        .secondary-values {
-            display: flex;
-            gap: 16px;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        .secondary-values { display: flex; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); flex-wrap: wrap; }
+        .event-log { background: rgba(255, 255, 255, 0.05); border-radius: 12px; max-height: 400px; overflow-y: auto; }
+        .event-item { padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; gap: 12px; }
+        .hidden { display: none; }
+        .controls-wrapper { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        @media (min-width: 640px) { .controls-wrapper { flex-direction: row; flex-wrap: wrap; align-items: center; width: auto; gap: 16px; } }
+        .download-btn, .record-btn, .time-select {
+            padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; min-height: 44px;
         }
-
-        .secondary-value label {
-            font-size: 11px;
-            color: #94a3b8;
-            display: block;
-            font-weight: 600;
+        .download-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white; border: none;
         }
-
-        .secondary-value span {
-            font-size: 14px;
-            color: #f1f5f9;
-            font-weight: 600;
+        .record-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .record-btn.recording { background: #ef4444; border-color: #ef4444; animation: pulse 1.5s infinite; }
+        .time-select { background: rgba(255, 255, 255, 0.1); color: #f1f5f9; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .date-inputs { display: none; flex-direction: column; gap: 8px; width: 100%; }
+        .date-inputs.show { display: flex; }
+        @media (min-width: 640px) { .date-inputs { flex-direction: row; width: auto; } }
+        .date-input { background: rgba(255, 255, 255, 0.1); color: #f1f5f9; border: 1px solid rgba(255, 255, 255, 0.2); padding: 10px 12px; border-radius: 8px; }
+        .section-header { margin-bottom: 12px; }
+        .section-header h3 { font-size: 12px; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        
+        /* Production Data Styles */
+        #view-production { background: transparent; }
+        .prod-container {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
         }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        @media (min-width: 768px) {
-            .section-header {
-                gap: 8px;
-                margin-bottom: 12px;
-            }
-        }
-
-        .section-header h3 {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #94a3b8;
-            font-weight: 600;
-        }
-
-        .event-log {
-            background: rgba(255, 255, 255, 0.05);
+        .kpi-card {
+            background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            max-height: 400px;
+            padding: 16px;
+        }
+        .chart-container {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        canvas { max-height: 300px; width: 100%; }
+        
+        /* Delay indicator */
+        .delay-badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .threshold-info {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 8px;
+            text-align: center;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
             overflow-y: auto;
         }
-
-        .event-log::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .event-log::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-        }
-
-        .event-log::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        .event-item {
-            padding: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        .modal-header {
+            background: #2563eb;
+            padding: 16px 20px;
             display: flex;
-            gap: 12px;
-            transition: background 0.2s;
-        }
-
-        .event-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .event-item:last-child {
-            border-bottom: none;
-        }
-
-        .event-icon {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .event-content {
-            flex: 1;
-        }
-
-        .event-message {
-            font-size: 14px;
-            color: #f1f5f9;
-        }
-
-        .event-sensor {
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        .event-time {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .chart-wrapper {
-            margin-top: 16px;
-        }
-
-        canvas {
-            max-width: 100%;
-            will-change: auto;
-        }
-
-        .card canvas {
-            transform: translateZ(0);
-            backface-visibility: hidden;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .prod-kpi-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-
-        @media (max-width: 768px) {
-            .prod-kpi-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .prod-kpi-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .prod-kpi {
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(155deg, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.08) 35%, rgba(255, 255, 255, 0.05));
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            border-radius: 14px;
-            padding: 18px 16px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35);
-            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-        }
-
-        .prod-kpi::before {
-            content: "";
-            position: absolute;
-            top: -25px;
-            right: -20px;
-            width: 88px;
-            height: 88px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(96, 165, 250, 0.32), rgba(96, 165, 250, 0));
-            pointer-events: none;
-        }
-
-        .prod-kpi:hover {
-            transform: translateY(-3px);
-            border-color: rgba(96, 165, 250, 0.32);
-            box-shadow: 0 14px 36px rgba(2, 6, 23, 0.45);
-        }
-
-        .prod-kpi .pk-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #bfdbfe;
-            font-weight: 600;
-        }
-
-        .prod-kpi .pk-val {
-            font-size: 24px;
-            font-weight: 800;
-            margin-top: 9px;
-            color: #f8fafc;
-            text-shadow: 0 1px 16px rgba(96, 165, 250, 0.24);
-        }
-
-        .farm-card-title {
-            font-size: 17px;
-            font-weight: 700;
-            margin: 0 0 12px;
-            color: #f8fafc;
-            letter-spacing: -0.01em;
-        }
-
-        .farm-summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            background: rgba(15, 23, 42, 0.35);
-            border: 1px solid rgba(148, 163, 184, 0.15);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .farm-summary-table th {
-            text-align: left;
-            color: #94a3b8;
-            font-weight: 600;
-            padding: 10px 12px 10px 0;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-            width: 42%;
-        }
-
-        .farm-summary-table td {
-            color: #f1f5f9;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-        }
-
-        .farm-table-wrap {
-            overflow: auto;
-            max-height: 360px;
-            margin-top: 8px;
-            border: 1px solid rgba(148, 163, 184, 0.17);
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.4);
-        }
-
-        .farm-table-wrap table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        .farm-table-wrap tbody tr {
-            transition: background 0.2s ease;
-        }
-
-        .farm-table-wrap tbody tr:hover {
-            background: rgba(59, 130, 246, 0.14);
-        }
-
-        .farm-table-wrap th,
-        .farm-table-wrap td {
-            padding: 10px 8px;
-            text-align: left;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-        }
-
-        .farm-table-wrap thead th {
-            color: #cbd5e1;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(6px);
-            z-index: 2;
-        }
-
-        .farm-actions {
-            margin-top: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
+            border-radius: 16px 16px 0 0;
         }
-
-        .btn-farm {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.28), rgba(124, 58, 237, 0.24));
-            color: #f8fafc;
-            border: 1px solid rgba(125, 211, 252, 0.28);
-            padding: 9px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
-            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.25);
-        }
-
-        .btn-farm:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(124, 58, 237, 0.36));
-            border-color: rgba(125, 211, 252, 0.45);
-            box-shadow: 0 10px 22px rgba(2, 6, 23, 0.36);
-        }
-
-        .btn-farm:active {
-            transform: translateY(0);
-        }
-
-        .farm-period-select {
-            background: rgba(15, 23, 42, 0.75);
-            color: #f1f5f9;
-            border: 1px solid rgba(148, 163, 184, 0.28);
+        .modal-header h3 { color: white; font-weight: 600; margin: 0; }
+        .modal-close { color: white; font-size: 24px; cursor: pointer; background: none; border: none; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 12px 20px; background: #f9fafb; display: flex; justify-content: flex-end; gap: 12px; border-radius: 0 0 16px 16px; }
+        .form-label { display: block; color: #374151; font-weight: 500; margin-bottom: 4px; font-size: 14px; }
+        .form-input, .form-select {
+            width: 100%;
             padding: 8px 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-family: inherit;
-            cursor: pointer;
-        }
-
-        #production-toolbar-hint {
-            display: none;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(124, 58, 237, 0.16));
-            border: 1px solid rgba(125, 211, 252, 0.3);
-            border-radius: 10px;
-            color: #dbeafe;
-            font-size: 13px;
-            font-weight: 500;
-            width: 100%;
-        }
-
-        @media (min-width: 640px) {
-            #production-toolbar-hint {
-                width: auto;
-            }
-        }
-
-        .prod-context-bar {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            background: linear-gradient(160deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.75));
-            box-shadow: 0 14px 30px rgba(2, 6, 23, 0.35);
-        }
-
-        .prod-context-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px 16px;
-            align-items: flex-end;
-        }
-
-        .prod-context-row label {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #cbd5e1;
-            font-weight: 600;
-        }
-
-        .input-prod,
-        .select-prod {
-            background: rgba(15, 23, 42, 0.72);
-            border: 1px solid rgba(148, 163, 184, 0.24);
-            color: #f1f5f9;
-            padding: 9px 11px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            min-width: 160px;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-        }
-
-        .input-prod:focus,
-        .select-prod:focus {
-            outline: none;
-            border-color: rgba(96, 165, 250, 0.7);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
-            background: rgba(15, 23, 42, 0.9);
-        }
-
-        .select-prod option {
-            background: #1e293b;
-            color: #f1f5f9;
-        }
-
-        .prod-subtabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 16px;
-            padding: 4px;
-            background: rgba(15, 23, 42, 0.58);
-            border-radius: 10px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-        }
-
-        .prod-subtab {
-            padding: 9px 13px;
-            border: 1px solid transparent;
+            border: 1px solid #d1d5db;
             border-radius: 8px;
-            background: transparent;
-            color: #94a3b8;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 14px;
+            color: #111827;
+            background: white;
+            margin-bottom: 16px;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            ring: 2px solid #93c5fd;
+        }
+        .btn-cancel { padding: 8px 16px; background: #e5e7eb; color: #374151; border-radius: 8px; border: none; cursor: pointer; }
+        .btn-save { padding: 8px 16px; background: #2563eb; color: white; border-radius: 8px; border: none; cursor: pointer; }
+        
+        /* Poultry Pro Navigation */
+        .poultry-nav {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .poultry-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: #cbd5e1;
             cursor: pointer;
-            font-family: inherit;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .poultry-nav-item:hover { background: rgba(59, 130, 246, 0.1); }
+        .poultry-nav-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: white;
+            border-left-color: #3b82f6;
+        }
+        .btn-prod {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.2s;
         }
-
-        .prod-subtab:hover {
-            color: #f1f5f9;
-            background: rgba(59, 130, 246, 0.16);
-            border-color: rgba(96, 165, 250, 0.24);
-        }
-
-        .prod-subtab.active {
-            color: #fff;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(124, 58, 237, 0.32));
-            border: 1px solid rgba(125, 211, 252, 0.4);
-            box-shadow: 0 6px 14px rgba(2, 6, 23, 0.3);
-        }
-
-        .prod-subtab.hidden-role {
-            display: none !important;
-        }
-
-        .prod-panel {
-            margin-bottom: 16px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            box-shadow: 0 14px 28px rgba(2, 6, 23, 0.32);
-        }
-
-        .form-grid-prod {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px 16px;
-            margin-top: 12px;
-        }
-
-        @media (min-width: 640px) {
-            .form-grid-prod {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .form-grid-prod label {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 12px;
-            color: #cbd5e1;
-        }
-
-        .form-actions-prod {
-            grid-column: 1 / -1;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .role-badge {
-            font-size: 11px;
-            padding: 5px 11px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(124, 58, 237, 0.32));
-            color: #e0f2fe;
-            border: 1px solid rgba(125, 211, 252, 0.45);
-            box-shadow: 0 4px 12px rgba(2, 6, 23, 0.28);
-        }
-
-        #monitoring-toolbar {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .btn-prod:hover { transform: translateY(-1px); opacity: 0.9; }
+        .prod-table {
             width: 100%;
+            border-collapse: collapse;
         }
-
-        @media (min-width: 640px) {
-            #monitoring-toolbar {
-                flex-direction: row;
-                flex-wrap: wrap;
-                align-items: center;
-                width: auto;
-                gap: 16px;
-            }
-        }
-
-        .download-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            color: white;
-            border: none;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-            width: 100%;
-            min-height: 44px;
-        }
-
-        @media (min-width: 640px) {
-            .download-btn {
-                width: auto;
-                padding: 10px 20px;
-                font-size: 14px;
-                gap: 8px;
-            }
-        }
-
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-        }
-
-        .download-btn:active {
-            transform: translateY(0);
-        }
-
-        .record-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.3s;
-            width: 100%;
-            min-height: 44px;
-        }
-
-        @media (min-width: 640px) {
-            .record-btn {
-                width: auto;
-                padding: 10px 20px;
-                font-size: 14px;
-                gap: 8px;
-            }
-        }
-
-        .record-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .record-btn.recording {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            border-color: #ef4444;
-            animation: recordPulse 1.5s infinite;
-        }
-
-        @keyframes recordPulse {
-            0%, 100% {
-                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-            }
-            50% {
-                box-shadow: 0 4px 20px rgba(239, 68, 68, 0.8);
-            }
-        }
-
-        .record-btn:active {
-            transform: translateY(0);
-        }
-
-        .time-select {
-            background: rgba(255, 255, 255, 0.1);
-            color: #f1f5f9;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .prod-table th, .prod-table td {
             padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.3s;
-            width: 100%;
-            min-height: 44px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        @media (min-width: 640px) {
-            .time-select {
-                width: auto;
-                padding: 10px 16px;
-                font-size: 14px;
-            }
+        .prod-table th {
+            color: #94a3b8;
+            font-weight: 600;
         }
-
-        .time-select:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
         }
-
-        .time-select option {
-            background: #1e293b;
-            color: #f1f5f9;
-        }
-
-        .date-inputs {
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-            align-items: stretch;
-            width: 100%;
-        }
-
-        .date-inputs.show {
-            display: flex;
-        }
-
-        @media (min-width: 640px) {
-            .date-inputs {
-                flex-direction: row;
-                align-items: center;
-                width: auto;
-            }
-        }
-
-        .date-input {
-            background: rgba(255, 255, 255, 0.1);
-            color: #f1f5f9;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            outline: none;
-            transition: all 0.3s;
-            width: 100%;
-        }
-
-        @media (min-width: 640px) {
-            .date-input {
-                width: auto;
-            }
-        }
-
-        .date-input:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .date-input::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
-
-        .controls-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-        }
-
-        @media (min-width: 640px) {
-            .controls-wrapper {
-                flex-direction: row;
-                flex-wrap: wrap;
-                align-items: center;
-                width: auto;
-                gap: 16px;
-            }
-
-            .date-separator {
-                display: inline !important;
-            }
-        }
+        .status-online { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .status-offline { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-simulated { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .dot-online { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+        .dot-offline { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; }
+        
+        .bg-gray-800 { background-color: rgba(31, 41, 55, 0.8); }
+        .text-green-400 { color: #4ade80; }
+        .text-blue-400 { color: #60a5fa; }
+        .text-purple-400 { color: #c084fc; }
+        .text-orange-400 { color: #fb923c; }
+        .text-red-400 { color: #f87171; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-left">
-                <div class="icon-box">📡</div>
-                <div>
-                    <h1>Environmental Monitoring</h1>
-                    <p class="subtitle">Live sensor data • <span id="timestampLabel">Updated</span> <span id="timestamp">--:--:--</span></p>
-                </div>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="icon-box">📡</div>
+            <div>
+                <h1>Environmental Monitoring</h1>
+                <p class="subtitle">Live sensor data • <span id="timestampLabel">Updated</span> <span id="timestamp">--:--:--</span></p>
             </div>
-            <div class="controls-wrapper">
-                <div id="monitoring-toolbar">
+        </div>
+        <div class="controls-wrapper">
+            <div id="monitoring-toolbar">
                 <select id="timeRange" class="time-select" onchange="toggleDateInputs()">
                     <option value="all">All Time</option>
                     <option value="daily">Daily</option>
@@ -984,1854 +304,363 @@
                     <option value="custom">Custom Date Range</option>
                 </select>
                 <div id="dateInputs" class="date-inputs">
-                    <input type="date" id="startDate" class="date-input" placeholder="Start Date">
-                    <span style="color: #94a3b8; display: none;" class="date-separator">to</span>
-                    <input type="date" id="endDate" class="date-input" placeholder="End Date">
+                    <input type="date" id="startDate" class="date-input">
+                    <input type="date" id="endDate" class="date-input">
                 </div>
-                <button class="download-btn" onclick="downloadCSV()">
-                    📥 Download CSV
-                </button>
-                <button id="recordBtn" class="record-btn" onclick="toggleRecording()">
-                    <span id="recordIcon">🎤</span>
-                    <span id="recordText">Record Audio</span>
-                </button>
-                <div class="status">
-                    <div class="status-dot"></div>
-                    <span class="subtitle">Streaming</span>
-                </div>
-                </div>
-                <div id="production-toolbar-hint" class="hidden"><span>📋</span> Farm records are saved in this browser only (localStorage).</div>
+                <button class="download-btn" onclick="downloadCSV()">📥 Download CSV</button>
+                <button id="recordBtn" class="record-btn" onclick="toggleRecording()">🎤 Record Audio</button>
+                <div class="status"><div class="status-dot"></div><span class="subtitle">Streaming</span></div>
             </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="tabs">
-            <button type="button" class="tab tab-node active" onclick="switchNode(1)">Node 1</button>
-            <button type="button" class="tab tab-node" onclick="switchNode(2)">Node 2</button>
-            <button type="button" class="tab tab-production" onclick="switchToFarmRecords()">🐔 Production Data</button>
-        </div>
-
-        <div id="view-monitoring">
-        <!-- ThingSpeak Info -->
-        <div id="thingspeakInfo" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;">
-            <div>
-                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: #3b82f6; font-size: 13px;">
-                    <span>🔗</span>
-                    <strong>Live Data (Node 1 Only)</strong>
-                    <span id="connectionStatus"></span>
-                </div>
-                <div id="bannerSubtext" style="color: #94a3b8; font-size: 11px; margin-top: 4px; line-height: 1.4;">
-                    Field Mapping: field1=Temperature, field2=Humidity, field3=CO, field4=Noise, field5=Light, field6=PM2.5, field7=PM10, field8=NH3 • Node 2 uses simulated data
-                </div>
-            </div>
-            <button onclick="updateSensors()" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4); padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; width: 100%;">
-                🔄 Refresh
-            </button>
-        </div>
-
-        <style>
-        @media (min-width: 640px) {
-            #thingspeakInfo {
-                flex-direction: row !important;
-                justify-content: space-between;
-                align-items: center;
-                padding: 12px 16px !important;
-                margin-bottom: 24px !important;
-            }
-
-            #thingspeakInfo > div:first-child > div:first-child {
-                font-size: 14px !important;
-                gap: 8px !important;
-            }
-
-            #thingspeakInfo > div:first-child > div:last-child {
-                font-size: 12px !important;
-            }
-
-            #thingspeakInfo button {
-                width: auto !important;
-            }
-        }
-        </style>
-
-        <!-- Primary Sensors -->
-        <div class="grid grid-4" id="primary-sensors"></div>
-
-        <!-- TVOC Sensors -->
-        <div style="margin-bottom: 24px;">
-            <div class="section-header">
-                <h3>🌬️ Total Volatile Organic Compounds</h3>
-            </div>
-            <div class="grid grid-4" id="tvoc-sensors"></div>
-        </div>
-
-        <!-- Particulate Matter -->
-        <div style="margin-bottom: 24px;">
-            <div class="section-header">
-                <h3>⚠️ Particulate Matter</h3>
-            </div>
-            <div class="grid grid-2" id="pm-sensors"></div>
-        </div>
-
-        <!-- Charts -->
-        <div style="margin-bottom: 24px;">
-            <div class="section-header">
-                <h3>📈 Trend Analysis</h3>
-            </div>
-            <div class="grid grid-2">
-                <div class="card">
-                    <div class="card-header">
-                        <p class="sensor-label">Climate</p>
-                    </div>
-                    <div style="height: 120px;">
-                        <canvas id="climateChart"></canvas>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <p class="sensor-label">Air Quality</p>
-                    </div>
-                    <div style="height: 120px;">
-                        <canvas id="airChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Event Log -->
-        <div>
-            <div class="section-header">
-                <h3>📜 Event Log (<span id="event-count">0</span> events)</h3>
-            </div>
-            <div class="event-log" id="event-log"></div>
-        </div>
-        </div>
-
-        <!-- Production Data: schema-aligned (local demo; replace with API + auth later) -->
-        <div id="view-production" class="hidden">
-            <div class="card prod-context-bar">
-                <div class="prod-context-row" style="align-items: center; justify-content: space-between;">
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
-                        <span class="role-badge" id="pd-role-badge">Owner</span>
-                        <span class="subtitle" style="margin: 0;">Schema: farms → profiles → batches → daily / weights / inventory / sales / costs</span>
-                    </div>
-                    <div class="farm-actions" style="margin: 0;">
-                        <button type="button" class="btn-farm" id="pd-export-json">Export JSON backup</button>
-                        <button type="button" class="btn-farm" id="pd-import-json">Import JSON</button>
-                        <input type="file" id="pd-import-json-file" accept=".json,application/json" style="display: none;">
-                    </div>
-                </div>
-                <div class="prod-context-row">
-                    <label>Farm
-                        <select id="pd-farm-select" class="select-prod"></select>
-                    </label>
-                    <label>Acting role (demo)
-                        <select id="pd-role-select" class="select-prod">
-                            <option value="owner">Owner — full access</option>
-                            <option value="manager">Manager — no farm admin</option>
-                            <option value="staff">Staff — daily entry only</option>
-                        </select>
-                    </label>
-                    <label>Batch scope
-                        <select id="pd-batch-filter" class="select-prod">
-                            <option value="">All batches</option>
-                        </select>
-                    </label>
-                </div>
-                <p class="subtitle" style="margin: 0; line-height: 1.5;">Browser-only prototype. Production: Owner registers farm; Manager/Staff join with Farm ID. Real <code style="color:#94a3b8;">owner_id</code> and profiles come from your auth backend.</p>
-            </div>
-
-            <div class="prod-subtabs" id="pd-subtabs"></div>
-
-            <div id="pd-panel-overview" class="prod-panel card hidden">
-                <h2 class="farm-card-title">Overview</h2>
-                <div class="prod-kpi-row" id="pd-overview-kpis"></div>
-                <p class="subtitle" id="pd-overview-note" style="margin-top: 12px;"></p>
-            </div>
-
-            <div id="pd-panel-batches" class="prod-panel card hidden">
-                <h2 class="farm-card-title">Batches</h2>
-                <p class="subtitle">Table: <strong>batches</strong> — id, farm_id, name, strain, initial_birds, start_date, status</p>
-                <div class="farm-table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th><th>Strain</th><th>Initial birds</th><th>Start</th><th>Status</th><th>id</th><th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="pd-tbody-batches"></tbody>
-                    </table>
-                </div>
-                <form id="pd-form-batch" class="form-grid-prod">
-                    <label>Name<input class="input-prod" name="name" required placeholder="Batch A"></label>
-                    <label>Strain<input class="input-prod" name="strain" placeholder="Cobb 500"></label>
-                    <label>Initial birds<input class="input-prod" type="number" name="initial_birds" min="0" value="0"></label>
-                    <label>Start date<input class="input-prod" type="date" name="start_date" required></label>
-                    <label>Status
-                        <select class="select-prod" name="status">
-                            <option value="active">active</option>
-                            <option value="closed">closed</option>
-                            <option value="planned">planned</option>
-                        </select>
-                    </label>
-                    <div class="form-actions-prod">
-                        <button type="submit" class="btn-farm">Add batch</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="pd-panel-daily" class="prod-panel card hidden">
-                <h2 class="farm-card-title">Daily records</h2>
-                <p class="subtitle">Table: <strong>daily_records</strong> — batch_id, date, mortality, feed_consumed, water_consumed</p>
-                <div class="farm-table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Batch</th><th>Date</th><th>Mortality</th><th>Feed</th><th>Water</th><th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="pd-tbody-daily"></tbody>
-                    </table>
-                </div>
-                <form id="pd-form-daily" class="form-grid-prod">
-                    <label>Batch
-                        <select class="select-prod" name="batch_id" id="pd-daily-batch" required></select>
-                    </label>
-                    <label>Date<input class="input-prod" type="date" name="date" required></label>
-                    <label>Mortality (birds)<input class="input-prod" type="number" name="mortality" min="0" value="0"></label>
-                    <label>Feed consumed<input class="input-prod" type="number" name="feed_consumed" min="0" step="0.01" value="0"></label>
-                    <label>Water consumed<input class="input-prod" type="number" name="water_consumed" min="0" step="0.01" value="0"></label>
-                    <div class="form-actions-prod">
-                        <button type="submit" class="btn-farm">Save daily record</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="pd-panel-weights" class="prod-panel card hidden">
-                <h2 class="farm-card-title">Weight records</h2>
-                <p class="subtitle">Table: <strong>weight_records</strong> — batch_id, date, avg_weight, sample_size</p>
-                <div class="farm-table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Batch</th><th>Date</th><th>Avg weight</th><th>Sample size</th><th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="pd-tbody-weights"></tbody>
-                    </table>
-                </div>
-                <form id="pd-form-weight" class="form-grid-prod">
-                    <label>Batch
-                        <select class="select-prod" name="batch_id" id="pd-weight-batch" required></select>
-                    </label>
-                    <label>Date<input class="input-prod" type="date" name="date" required></label>
-                    <label>Avg weight (g)<input class="input-prod" type="number" name="avg_weight" min="0" step="0.1" required></label>
-                    <label>Sample size<input class="input-prod" type="number" name="sample_size" min="1" value="30"></label>
-                    <div class="form-actions-prod">
-                        <button type="submit" class="btn-farm">Save weight record</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="pd-panel-inventory" class="prod-panel card hidden">
-                <h2 class="farm-card-title">Inventory</h2>
-                <p class="subtitle">Table: <strong>inventory</strong> — batch_id, type, brand, category, quantity, unit_cost, total_cost</p>
-                <div class="farm-table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Batch</th><th>Type</th><th>Brand</th><th>Category</th><th>Qty</th><th>Unit cost</th><th>Total</th><th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="pd-tbody-inventory"></tbody>
-                    </table>
-                </div>
-                <form id="pd-form-inventory" class="form-grid-prod">
-                    <label>Batch
-                        <select class="select-prod" name="batch_id" id="pd-inv-batch" required></select>
-                    </label>
-                    <label>Type<input class="input-prod" name="type" placeholder="feed / med"></label>
-                    <label>Brand<input class="input-prod" name="brand"></label>
-                    <label>Category<input class="input-prod" name="category"></label>
-                    <label>Quantity<input class="input-prod" type="number" name="quantity" min="0" step="0.01" value="0"></label>
-                    <label>Unit cost<input class="input-prod" type="number" name="unit_cost" min="0" step="0.01" value="0"></label>
-                    <label>Total cost<input class="input-prod" type="number" name="total_cost" min="0" step="0.01" value="0"></label>
-                    <div class="form-actions-prod">
-                        <button type="submit" class="btn-farm">Add inventory line</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="pd-panel-sales" class="prod-panel card hidden">
-                <h2 class="farm-card-title">Sales</h2>
-                <p class="subtitle">Table: <strong>sales</strong> — batch_id, type, quantity, unit_price, total_revenue, buyer</p>
-                <div class="farm-table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Batch</th><th>Type</th><th>Qty</th><th>Unit price</th><th>Revenue</th><th>Buyer</th><th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="pd-tbody-sales"></tbody>
-                    </table>
-                </div>
-                <form id="pd-form-sales" class="form-grid-prod">
-                    <label>Batch
-                        <select class="select-prod" name="batch_id" id="pd-sales-batch" required></select>
-                    </label>
-                    <label>Type<input class="input-prod" name="type" placeholder="live / dressed"></label>
-                    <label>Quantity<input class="input-prod" type="number" name="quantity" min="0" step="0.01" value="0"></label>
-                    <label>Unit price<input class="input-prod" type="number" name="unit_price" min="0" step="0.01" value="0"></label>
-                    <label>Total revenue<input class="input-prod" type="number" name="total_revenue" min="0" step="0.01" value="0"></label>
-                    <label>Buyer<input class="input-prod" name="buyer"></label>
-                    <div class="form-actions-prod">
-                        <button type="submit" class="btn-farm">Add sale</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="pd-panel-costs" class="prod-panel card hidden">
-                <h2 class="farm-card-title">Other costs</h2>
-                <p class="subtitle">Table: <strong>costs</strong> — batch_id, category, description, amount</p>
-                <div class="farm-table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Batch</th><th>Category</th><th>Description</th><th>Amount</th><th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="pd-tbody-costs"></tbody>
-                    </table>
-                </div>
-                <form id="pd-form-costs" class="form-grid-prod">
-                    <label>Batch
-                        <select class="select-prod" name="batch_id" id="pd-costs-batch" required></select>
-                    </label>
-                    <label>Category<input class="input-prod" name="category" placeholder="labour / energy"></label>
-                    <label>Description<input class="input-prod" name="description"></label>
-                    <label>Amount<input class="input-prod" type="number" name="amount" min="0" step="0.01" value="0"></label>
-                    <div class="form-actions-prod">
-                        <button type="submit" class="btn-farm">Add cost</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="pd-panel-admin" class="prod-panel card hidden">
-                <h2 class="farm-card-title">Farms &amp; team (Owner)</h2>
-                <p class="subtitle"><strong>farms</strong>: id, name, owner_id &nbsp;|&nbsp; <strong>profiles</strong>: id, farm_id, full_name, role</p>
-                <h3 class="farm-card-title" style="font-size: 14px; margin-top: 16px;">Farms</h3>
-                <div class="farm-table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>Name</th><th>owner_id</th><th>id</th><th></th></tr>
-                        </thead>
-                        <tbody id="pd-tbody-farms"></tbody>
-                    </table>
-                </div>
-                <form id="pd-form-farm" class="form-grid-prod">
-                    <label>Farm name<input class="input-prod" name="name" required></label>
-                    <label>Owner id (auth user id)<input class="input-prod" name="owner_id" placeholder="from Supabase Auth UUID"></label>
-                    <div class="form-actions-prod">
-                        <button type="submit" class="btn-farm">Add farm</button>
-                    </div>
-                </form>
-                <h3 class="farm-card-title" style="font-size: 14px; margin-top: 20px;">Profiles</h3>
-                <div class="farm-table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>Farm</th><th>Full name</th><th>Role</th><th>id</th><th></th></tr>
-                        </thead>
-                        <tbody id="pd-tbody-profiles"></tbody>
-                    </table>
-                </div>
-                <form id="pd-form-profile" class="form-grid-prod">
-                    <label>Farm
-                        <select class="select-prod" name="farm_id" id="pd-profile-farm" required></select>
-                    </label>
-                    <label>Full name<input class="input-prod" name="full_name" required></label>
-                    <label>Role
-                        <select class="select-prod" name="role">
-                            <option value="owner">owner</option>
-                            <option value="manager">manager</option>
-                            <option value="staff">staff</option>
-                        </select>
-                    </label>
-                    <div class="form-actions-prod">
-                        <button type="submit" class="btn-farm">Add profile</button>
-                    </div>
-                </form>
-            </div>
+            <div id="production-toolbar-hint" class="hidden"><span>📋</span> Poultry Pro - Farm Manager</div>
         </div>
     </div>
 
-    <script>
-        let currentNode = 1;
-        let dashboardView = 'monitoring';
-        let chartData = { climate: [], air: [] };
-        let events = [];
-        let climateChart, airChart;
-        let sensorHistory = []; // Store all sensor readings with timestamps
-        let mediaRecorder;
-        let audioChunks = [];
-        let isRecording = false;
-        let isLiveData = false;
-        let isOnline = false;
-        let lastUpdateTime = null;
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab tab-node active" onclick="switchNode(1)">Node 1</button>
+        <button class="tab tab-node" onclick="switchNode(2)">Node 2</button>
+        <button class="tab tab-production" onclick="switchToFarmRecords()">🐔 Production Data</button>
+    </div>
 
-        // ThingSpeak Configuration
-        const THINGSPEAK_CHANNEL_ID = '3187445';
-        const THINGSPEAK_READ_API_KEY = ''; // Add if channel is private
-        const THINGSPEAK_API_URL = `https://api.thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/feeds.json`;
-
-        // Field mapping for ThingSpeak
-        // field1 = Temperature (°C)
-        // field2 = Humidity (%)
-        // field3 = CO (ppm)
-        // field4 = Noise Current (dB)
-        // field5 = Light Intensity (lux)
-        // field6 = PM 2.5 (μg/m³)
-        // field7 = PM 10 (μg/m³)
-        // field8 = NH3 (ppb)
-
-        // Initialize charts
-        function initCharts() {
-            const chartConfig = {
-                type: 'line',
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    transitions: {
-                        active: {
-                            animation: {
-                                duration: 0
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: { color: '#94a3b8', font: { size: 11 } }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            ticks: { color: '#64748b', font: { size: 10 } },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            ticks: { color: '#64748b', font: { size: 10 } },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
-                    },
-                    elements: {
-                        line: {
-                            borderWidth: 2
-                        },
-                        point: {
-                            radius: 0,
-                            hitRadius: 0,
-                            hoverRadius: 0
-                        }
-                    }
-                }
-            };
-
-            climateChart = new Chart(document.getElementById('climateChart'), {
-                ...chartConfig,
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Temperature (°C)',
-                            data: [],
-                            borderColor: '#f97316',
-                            backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                            tension: 0.2,
-                            borderWidth: 2
-                        },
-                        {
-                            label: 'Humidity (%)',
-                            data: [],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            tension: 0.2,
-                            borderWidth: 2
-                        }
-                    ]
-                }
-            });
-
-            airChart = new Chart(document.getElementById('airChart'), {
-                ...chartConfig,
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'PM 2.5 (μg/m³)',
-                            data: [],
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                            tension: 0.2,
-                            borderWidth: 2
-                        }
-                    ]
-                }
-            });
-        }
-
-        // Fetch data from ThingSpeak (Node 1 only)
-        async function fetchThingSpeakData() {
-            try {
-                const url = `${THINGSPEAK_API_URL}?results=1`;
-
-                // Add timeout to detect offline faster
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-                const response = await fetch(url, { signal: controller.signal });
-                clearTimeout(timeoutId);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.feeds && data.feeds.length > 0) {
-                    const feed = data.feeds[0];
-
-                    // Check if data is fresh (updated within last 30 seconds)
-                    const dataTimestamp = new Date(feed.created_at);
-                    const now = new Date();
-                    const ageInSeconds = (now - dataTimestamp) / 1000;
-
-                    if (ageInSeconds <= 30) {
-                        // Data is fresh - node is online
-                        isLiveData = true;
-                        isOnline = true;
-                        lastUpdateTime = dataTimestamp;
-
-                        // Only update status if we're on Node 1
-                        if (currentNode === 1) {
-                            updateConnectionStatus(true);
-                            updateInfoBanner(true);
-                        }
-                    } else {
-                        // Data is stale - node is offline
-                        isLiveData = false;
-                        isOnline = false;
-                        lastUpdateTime = dataTimestamp;
-
-                        // Only update status if we're on Node 1
-                        if (currentNode === 1) {
-                            updateConnectionStatus(false);
-                            updateInfoBanner(false);
-                        }
-                    }
-
-                    // Return the data regardless of online/offline status
-                    // This shows last known values when offline
-                    return {
-                        temperature: parseFloat(feed.field1) || 22.5,
-                        humidity: parseFloat(feed.field2) || 50.0,
-                        lightIntensity: parseFloat(feed.field5) || 500,
-                        noise: {
-                            current: parseFloat(feed.field4) || 45.0,
-                            peak: 70.0,
-                            average: 55.0
-                        },
-                        tvoc: {
-                            nh3: parseFloat(feed.field8) || 10.0,
-                            no2: 5.0,
-                            h2s: 3.0,
-                            co: parseFloat(feed.field3) || 20.0
-                        },
-                        particulate: {
-                            pm25: parseFloat(feed.field6) || 15.0,
-                            pm10: parseFloat(feed.field7) || 25.0
-                        }
-                    };
-                } else {
-                    throw new Error('No feed data available');
-                }
-            } catch (error) {
-                console.error('Error fetching ThingSpeak data:', error.message || error);
-                isLiveData = false;
-                isOnline = false;
-
-                // Only update status if we're on Node 1
-                if (currentNode === 1) {
-                    updateConnectionStatus(false);
-                    updateInfoBanner(false);
-                }
-
-                // Return fallback mock data if API fails
-                return generateMockSensorData(1);
-            }
-        }
-
-        // Update connection status indicator
-        function updateConnectionStatus(connected, nodeLabel = '') {
-            const statusDot = document.querySelector('.status-dot');
-            const statusText = document.querySelector('.status .subtitle');
-
-            if (connected) {
-                statusDot.style.backgroundColor = '#22c55e';
-                statusText.textContent = 'Live Data';
-            } else {
-                if (nodeLabel === 'Node 2') {
-                    statusDot.style.backgroundColor = '#8b5cf6';
-                    statusText.textContent = 'Simulated';
-                } else {
-                    statusDot.style.backgroundColor = '#f59e0b';
-                    statusText.textContent = 'Connection Error';
-                }
-            }
-        }
-
-        // Generate mock sensor data (fallback)
-        function generateMockSensorData(nodeId) {
-            const offset = nodeId === 1 ? 0 : 3;
-            return {
-                temperature: 20 + offset + Math.random() * 8,
-                humidity: 40 + offset * 2 + Math.random() * 20,
-                lightIntensity: 200 + offset * 50 + Math.random() * 800,
-                noise: {
-                    current: 40 + offset * 3 + Math.random() * 40,
-                    peak: 60 + offset * 2 + Math.random() * 30,
-                    average: 45 + offset * 2 + Math.random() * 20
-                },
-                tvoc: {
-                    nh3: offset * 5 + Math.random() * 50,
-                    no2: offset * 3 + Math.random() * 30,
-                    h2s: offset * 2 + Math.random() * 20,
-                    co: offset * 10 + Math.random() * 100
-                },
-                particulate: {
-                    pm25: offset * 4 + Math.random() * 35,
-                    pm10: offset * 5 + Math.random() * 50
-                }
-            };
-        }
-
-        // Get status
-        function getStatus(value, warning, critical, inverse = false) {
-            if (inverse) {
-                if (value < critical) return 'red';
-                if (value < warning) return 'amber';
-                return 'green';
-            }
-            if (value > critical) return 'red';
-            if (value > warning) return 'amber';
-            return 'green';
-        }
-
-        function showMonitoringView() {
-            dashboardView = 'monitoring';
-            document.getElementById('view-monitoring').classList.remove('hidden');
-            document.getElementById('view-production').classList.add('hidden');
-            document.getElementById('monitoring-toolbar').classList.remove('hidden');
-            document.getElementById('production-toolbar-hint').classList.add('hidden');
-            document.querySelector('.tab-production')?.classList.remove('active');
-        }
-
-        function switchToFarmRecords() {
-            dashboardView = 'production';
-            document.getElementById('view-monitoring').classList.add('hidden');
-            document.getElementById('view-production').classList.remove('hidden');
-            document.getElementById('monitoring-toolbar').classList.add('hidden');
-            document.getElementById('production-toolbar-hint').classList.remove('hidden');
-            document.querySelectorAll('.tab-node').forEach((t) => t.classList.remove('active'));
-            document.querySelector('.tab-production')?.classList.add('active');
-            if (typeof pdOnShowProductionTab === 'function') pdOnShowProductionTab();
-        }
-
-        // Update sensors
-        async function updateSensors() {
-            if (dashboardView !== 'monitoring') return;
-
-            let data;
-
-            // Use ThingSpeak data for Node 1, mock data for Node 2
-            if (currentNode === 1) {
-                data = await fetchThingSpeakData();
-            } else {
-                data = generateMockSensorData(currentNode);
-                updateConnectionStatus(false, 'Node 2');
-            }
-
-            const timestamp = new Date();
-
-            // Store in history
-            sensorHistory.push({
-                timestamp: timestamp,
-                node: currentNode,
-                data: data
-            });
-
-            // Primary sensors
-            const primarySensors = [
-                { icon: '🌡️', label: 'Temperature', value: data.temperature.toFixed(1), unit: '°C',
-                  status: getStatus(data.temperature, 26, 30) },
-                { icon: '💧', label: 'Humidity', value: data.humidity.toFixed(1), unit: '%',
-                  status: getStatus(data.humidity, 55, 65) },
-                { icon: '☀️', label: 'Light Intensity', value: Math.round(data.lightIntensity), unit: 'lux',
-                  status: getStatus(data.lightIntensity, 300, 200, true) },
-                { icon: '🔊', label: 'Noise Level', value: data.noise.current.toFixed(1), unit: 'dB',
-                  status: getStatus(data.noise.current, 70, 85),
-                  secondary: [
-                    { label: 'Peak', value: data.noise.peak.toFixed(1) },
-                    { label: 'Avg', value: data.noise.average.toFixed(1) }
-                  ]
-                }
-            ];
-
-            document.getElementById('primary-sensors').innerHTML = primarySensors.map(s => `
-                <div class="card">
-                    <div class="card-header">
-                        <div class="sensor-icon">${s.icon}</div>
-                        <div class="status-indicator status-${s.status}"></div>
-                    </div>
-                    <p class="sensor-label">${s.label}</p>
-                    <div class="sensor-value">
-                        <span class="value-large color-${s.status}">${s.value}</span>
-                        <span class="value-unit">${s.unit}</span>
-                    </div>
-                    ${s.secondary ? `
-                        <div class="secondary-values">
-                            ${s.secondary.map(sec => `
-                                <div class="secondary-value">
-                                    <label>${sec.label}</label>
-                                    <span>${sec.value} dB</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
+    <!-- Monitoring View -->
+    <div id="view-monitoring">
+        <div style="background: rgba(59, 130, 246, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+            <div>
+                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <span>🔗</span>
+                    <strong>Live Data (Node 1 Only)</strong>
+                    <span id="connectionStatusBadge"></span>
                 </div>
-            `).join('');
+                <div id="lastUpdateInfo" style="color: #94a3b8; font-size: 11px; margin-top: 4px;"></div>
+            </div>
+            <button onclick="updateSensors()" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 8px 16px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(59, 130, 246, 0.4);">🔄 Refresh</button>
+        </div>
+        <div class="grid grid-4" id="primary-sensors"></div>
+        <div style="margin-bottom: 24px;">
+            <div class="section-header"><h3>🌬️ Total Volatile Organic Compounds</h3></div>
+            <div class="grid grid-4" id="tvoc-sensors"></div>
+            <div class="threshold-info">⚠️ Thresholds: NH₃ (🟢0–10 🟡11–25 🟠26–50 🔴>50 ppm) | H₂S (🟢0–2 🟡3–5 🟠6–10 🔴>10 ppm) | NO₂ (🟢0–1 🟡1.1–2 🟠2.1–5 🔴>5 ppm) | CO (🟢0–10 🟡11–25 🟠26–50 🔴>50 ppm)</div>
+        </div>
+        <div style="margin-bottom: 24px;">
+            <div class="section-header"><h3>⚠️ Particulate Matter</h3></div>
+            <div class="grid grid-2" id="pm-sensors"></div>
+            <div class="threshold-info">⚠️ Thresholds: PM2.5 (&gt;30μg/m³), PM1 (&gt;45μg/m³)</div>
+        </div>
+        <div style="margin-bottom: 24px;">
+            <div class="section-header"><h3>📈 Trend Analysis</h3></div>
+            <div class="grid grid-2">
+                <div class="card"><canvas id="climateChart" style="height: 120px;"></canvas></div>
+                <div class="card"><canvas id="airChart" style="height: 120px;"></canvas></div>
+            </div>
+        </div>
+        <div>
+            <div class="section-header"><h3>📜 Event Log (<span id="event-count">0</span> events)</h3></div>
+            <div class="event-log" id="event-log"></div>
+        </div>
+    </div>
 
-            // TVOC sensors
-            const tvocSensors = [
-                { label: 'NH₃', value: data.tvoc.nh3, warning: 35, critical: 45, unit: 'ppb' },
-                { label: 'NO₂', value: data.tvoc.no2, warning: 20, critical: 25, unit: 'ppb' },
-                { label: 'H₂S', value: data.tvoc.h2s, warning: 15, critical: 18, unit: 'ppb' },
-                { label: 'CO', value: data.tvoc.co, warning: 70, critical: 90, unit: 'ppm' }
-            ];
+    <!-- Production View -->
+    <div id="view-production" class="hidden">
+        <div id="poultryProRoot"></div>
+    </div>
+</div>
 
-            document.getElementById('tvoc-sensors').innerHTML = tvocSensors.map(s => {
-                const status = getStatus(s.value, s.warning, s.critical);
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <p class="sensor-label">${s.label}</p>
-                            <div class="status-indicator status-${status}"></div>
-                        </div>
-                        <div class="sensor-value">
-                            <span class="value-large color-${status}">${s.value.toFixed(1)}</span>
-                            <span class="value-unit">${s.unit}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+<script>
+    // ========== MONITORING SYSTEM ==========
+    let currentNode = 1;
+    let dashboardView = 'monitoring';
+    let events = [];
+    let climateChart, airChart;
+    let sensorHistory = [];
+    let mediaRecorder;
+    let isRecording = false;
+    let isNode1Online = false;
+    let lastDataTimestamp = null;
+    
+    // For CO mechanism (now direct from field3)
+    let currentNO2Value = 0.005;
 
-            // PM sensors
-            const pmSensors = [
-                { label: 'PM 2.5', value: data.particulate.pm25, warning: 25, critical: 30 },
-                { label: 'PM 10', value: data.particulate.pm10, warning: 40, critical: 45 }
-            ];
+    const THINGSPEAK_CHANNEL_ID = '3187445';
+    const THINGSPEAK_API_URL = `https://api.thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/feeds.json`;
 
-            document.getElementById('pm-sensors').innerHTML = pmSensors.map(s => {
-                const status = getStatus(s.value, s.warning, s.critical);
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <p class="sensor-label">${s.label}</p>
-                            <div class="status-indicator status-${status}"></div>
-                        </div>
-                        <div class="sensor-value">
-                            <span class="value-large color-${status}">${s.value.toFixed(1)}</span>
-                            <span class="value-unit">μg/m³</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+    // NH3 Thresholds (in ppm)
+    // Safe: 0-10 ppm (Green)
+    // Caution: 11-25 ppm (Yellow/Amber)
+    // Critical: 26-50 ppm (Red)
 
-            // Update charts
-            const time = new Date().toLocaleTimeString('en-US', {
-                hour12: false,
-                minute: '2-digit',
-                second: '2-digit'
-            });
+    function getNH3Status(value) {
+        if (value <= 10) return 'green';
+        if (value <= 25) return 'amber';
+        return 'red';
+    }
 
-            if (climateChart.data.labels.length >= 10) {
-                climateChart.data.labels.shift();
-                climateChart.data.datasets[0].data.shift();
-                climateChart.data.datasets[1].data.shift();
-                airChart.data.labels.shift();
-                airChart.data.datasets[0].data.shift();
-            }
+    function getStatus(value, safe, caution, alert) {
+        if (value <= safe) return 'green';
+        if (value <= caution) return 'amber';
+        if (value <= alert) return 'orange';
+        return 'red';
+    }
 
-            climateChart.data.labels.push(time);
-            climateChart.data.datasets[0].data.push(data.temperature);
-            climateChart.data.datasets[1].data.push(data.humidity);
-            climateChart.update('none');
+    function initCharts() {
+        const ctx1 = document.getElementById('climateChart').getContext('2d');
+        const ctx2 = document.getElementById('airChart').getContext('2d');
+        
+        climateChart = new Chart(ctx1, {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Temperature (°C)', data: [], borderColor: '#f97316', tension: 0.2 }, { label: 'Humidity (%)', data: [], borderColor: '#3b82f6', tension: 0.2 }] },
+            options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#64748b' } }, y: { ticks: { color: '#64748b' } } } }
+        });
+        
+        airChart = new Chart(ctx2, {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'PM 2.5 (μg/m³)', data: [], borderColor: '#8b5cf6', tension: 0.2 }] },
+            options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#64748b' } }, y: { ticks: { color: '#64748b' } } } }
+        });
+    }
 
-            airChart.data.labels.push(time);
-            airChart.data.datasets[0].data.push(data.particulate.pm25);
-            airChart.update('none');
-        }
-
-        // Add event
-        function addEvent() {
-            if (Math.random() > 0.3) return;
-
-            const templates = [
-                { type: 'info', icon: 'ℹ️', color: '#3b82f6', sensor: 'Temperature', message: 'Reading normalized' },
-                { type: 'success', icon: '✓', color: '#22c55e', sensor: 'Humidity', message: 'Optimal range maintained' },
-                { type: 'warning', icon: '⚠️', color: '#f59e0b', sensor: 'PM 2.5', message: 'Elevated particulate detected' },
-                { type: 'error', icon: '✕', color: '#ef4444', sensor: 'NO₂', message: 'Critical level exceeded' }
-            ];
-
-            const template = templates[Math.floor(Math.random() * templates.length)];
-            const event = {
-                ...template,
-                message: `[Node ${currentNode}] ${template.message}`,
-                timestamp: new Date()
-            };
-
-            events.unshift(event);
-            events = events.slice(0, 50);
-
-            document.getElementById('event-count').textContent = events.length;
-            document.getElementById('event-log').innerHTML = events.map(e => `
-                <div class="event-item">
-                    <div class="event-icon" style="color: ${e.color}">${e.icon}</div>
-                    <div class="event-content">
-                        <div class="event-message">
-                            ${e.message} <span class="event-sensor">• ${e.sensor}</span>
-                        </div>
-                        <p class="event-time">${e.timestamp.toLocaleTimeString('en-US', {
-                            hour12: false,
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        })}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Switch node
-        function switchNode(nodeId) {
-            showMonitoringView();
-            currentNode = nodeId;
-            document.querySelectorAll('.tab-node').forEach((tab, index) => {
-                tab.classList.toggle('active', index === nodeId - 1);
-            });
-
-            // Reset charts
-            climateChart.data.labels = [];
-            climateChart.data.datasets[0].data = [];
-            climateChart.data.datasets[1].data = [];
-            airChart.data.labels = [];
-            airChart.data.datasets[0].data = [];
-
-            // Reset events
-            events = [];
-            document.getElementById('event-log').innerHTML = '';
-
-            // Update status based on node
-            if (nodeId === 1) {
-                updateConnectionStatus(isOnline);
-                updateInfoBanner(isOnline);
-            } else {
-                updateConnectionStatus(false, 'Node 2');
-                updateInfoBanner(false);
-            }
-
-            // Note: sensorHistory is preserved across node switches
-            // so you can download historical data from each node
-
-            updateSensors();
-            updateTimestamp();
-        }
-
-        // Update timestamp
-        function updateTimestamp() {
-            const timestampElement = document.getElementById('timestamp');
-            const timestampLabel = document.getElementById('timestampLabel');
-
-            if (currentNode === 1 && !isOnline && lastUpdateTime) {
-                // Node 1 offline - show last update time
-                timestampLabel.textContent = 'Last update';
-                timestampElement.textContent = lastUpdateTime.toLocaleTimeString();
-            } else {
-                // Node online or Node 2
-                timestampLabel.textContent = 'Updated';
-                timestampElement.textContent = new Date().toLocaleTimeString();
-            }
-        }
-
-        // Update info banner status
-        function updateInfoBanner(online) {
-            const statusBadge = document.getElementById('connectionStatus');
-            const bannerSubtext = document.getElementById('bannerSubtext');
-
-            // Only show status for Node 1
-            if (currentNode !== 1) {
-                statusBadge.innerHTML = '';
-                if (bannerSubtext) bannerSubtext.style.display = 'block';
-                return;
-            }
-
+    function updateConnectionStatusDisplay(online, lastTime = null) {
+        const badgeSpan = document.getElementById('connectionStatusBadge');
+        const lastUpdateSpan = document.getElementById('lastUpdateInfo');
+        
+        if (currentNode === 1) {
             if (online) {
-                statusBadge.innerHTML = '<span style="display: inline-flex; align-items: center; gap: 4px; background: rgba(34, 197, 94, 0.2); color: #22c55e; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; border: 1px solid rgba(34, 197, 94, 0.3);"><span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);"></span>Online</span>';
-                if (bannerSubtext) bannerSubtext.style.display = 'block';
+                badgeSpan.innerHTML = '<span class="status-badge status-online"><span class="dot-online"></span>Online</span>';
+                if (lastTime) lastUpdateSpan.innerHTML = `Last update: ${lastTime.toLocaleString()}`;
             } else {
-                let offlineMessage = 'Offline';
-                if (lastUpdateTime) {
-                    const lastUpdate = lastUpdateTime.toLocaleString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: true
-                    });
-                    offlineMessage = `Offline (Last: ${lastUpdate})`;
+                if (lastTime) {
+                    badgeSpan.innerHTML = '<span class="status-badge status-offline"><span class="dot-offline"></span>Offline</span>';
+                    lastUpdateSpan.innerHTML = `Last data: ${lastTime.toLocaleString()}`;
+                } else {
+                    badgeSpan.innerHTML = '<span class="status-badge status-offline"><span class="dot-offline"></span>Offline</span>';
+                    lastUpdateSpan.innerHTML = 'Waiting for data...';
                 }
-
-                statusBadge.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; border: 1px solid rgba(239, 68, 68, 0.3);"><span style="width: 6px; height: 6px; background: #ef4444; border-radius: 50%;"></span>${offlineMessage}</span>`;
-                if (bannerSubtext) bannerSubtext.style.display = 'none';
             }
+        } else {
+            badgeSpan.innerHTML = '<span class="status-badge status-simulated"><span class="dot-offline" style="background:#a78bfa"></span>Simulated</span>';
+            lastUpdateSpan.innerHTML = 'Node 2 uses simulated data';
         }
+    }
 
-        // Toggle date inputs for custom range
-        function toggleDateInputs() {
-            const timeRange = document.getElementById('timeRange').value;
-            const dateInputs = document.getElementById('dateInputs');
+    async function fetchThingSpeakData() {
+        try {
+            const response = await fetch(`${THINGSPEAK_API_URL}?results=1`);
+            if (!response.ok) throw new Error();
+            const data = await response.json();
+            
+            if (data.feeds && data.feeds.length > 0) {
+                const feed = data.feeds[0];
+                const dataTimestamp = new Date(feed.created_at);
+                const ageInSeconds = (new Date() - dataTimestamp) / 1000;
+                isNode1Online = ageInSeconds <= 60;
+                lastDataTimestamp = dataTimestamp;
+                updateConnectionStatusDisplay(isNode1Online, dataTimestamp);
+                updateTimestamp();
+                
+                const no2Raw = feed.field3 || '0.005';
+                currentNO2Value = parseFloat(no2Raw) || 0.005;
+                
+                const nh3Ppm = parseFloat(feed.field8) || 10.0; // ThingSpeak NH3 feed is already in ppm
+                
+                return {
+                    temperature: parseFloat(feed.field1) || 22.5,
+                    humidity: parseFloat(feed.field2) || 50.0,
+                    lightIntensity: parseFloat(feed.field5) || 500,
+                    noise: { current: parseFloat(feed.field4) || 45.0, peak: 70.0, average: 55.0 },
+                    tvoc: {
+                        nh3: nh3Ppm,
+                        no2: currentNO2Value,
+                        no2Raw,
+                        h2s: 0.003,
+                        co: currentNO2Value
+                    },
+                    particulate: { pm25: parseFloat(feed.field6) || 15.0, pm10: parseFloat(feed.field7) || 25.0 }
+                };
+            }
+            throw new Error();
+        } catch (error) {
+            isNode1Online = false;
+            updateConnectionStatusDisplay(false, lastDataTimestamp);
+            return generateMockSensorData(1);
+        }
+    }
+    
+    function renderTVOCCards(tvoc) {
+        const tvocSensors = [
+            { label: 'NH₃', value: tvoc.nh3, safe: 10, caution: 25, alert: 50, unit: 'ppm', decimals: 1, delay: false },
+            { label: 'NO₂', value: tvoc.no2, safe: 1, caution: 2, alert: 5, unit: 'ppm', decimals: 1, delay: false, rawValue: tvoc.no2Raw },
+            { label: 'H₂S', value: tvoc.h2s, safe: 2, caution: 5, alert: 10, unit: 'ppm', decimals: 1, delay: false },
+            { label: 'CO', value: tvoc.co, safe: 10, caution: 25, alert: 50, unit: 'ppm', decimals: 1, delay: true }
+        ];
 
-            if (timeRange === 'custom') {
-                dateInputs.classList.add('show');
-                // Set default dates
-                const today = new Date();
-                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                document.getElementById('endDate').valueAsDate = today;
-                document.getElementById('startDate').valueAsDate = weekAgo;
+        return tvocSensors.map(s => {
+            const status = getStatus(s.value, s.safe, s.caution, s.alert);
+            const formattedValue = s.rawValue !== undefined ? s.rawValue : s.value.toFixed(s.decimals);
+            const delayBadge = s.delay ? '<span class="delay-badge" title="20 second delay">⏱️ 20s delay</span>' : '';
+            return `<div class="card"><p class="sensor-label">${s.label}${delayBadge}</p><div class="sensor-value"><span class="value-large color-${status}">${formattedValue}</span><span class="value-unit">${s.unit}</span></div><div class="status-indicator status-${status}" style="margin-top:8px"></div></div>`;
+        }).join('');
+    }
+
+    function updateTVOCDisplay() {
+        if (dashboardView !== 'monitoring' || sensorHistory.length === 0) return;
+        const lastData = sensorHistory[sensorHistory.length - 1].data;
+        const updatedTvoc = { ...lastData.tvoc, co: currentNO2Value };
+        document.getElementById('tvoc-sensors').innerHTML = renderTVOCCards(updatedTvoc);
+    }
+
+    function updateTimestamp() {
+        const tsElem = document.getElementById('timestamp');
+        const labelElem = document.getElementById('timestampLabel');
+        
+        if (currentNode === 1) {
+            if (isNode1Online && lastDataTimestamp) {
+                labelElem.textContent = 'Live';
+                tsElem.textContent = lastDataTimestamp.toLocaleTimeString();
+            } else if (lastDataTimestamp) {
+                labelElem.textContent = 'Last data';
+                tsElem.textContent = lastDataTimestamp.toLocaleTimeString();
             } else {
-                dateInputs.classList.remove('show');
+                labelElem.textContent = 'Status';
+                tsElem.textContent = 'Waiting...';
             }
+        } else {
+            labelElem.textContent = 'Simulated';
+            tsElem.textContent = new Date().toLocaleTimeString();
         }
+    }
 
-        // Toggle audio recording
-        async function toggleRecording() {
-            if (!isRecording) {
-                await startRecording();
-            } else {
-                stopRecording();
-            }
+    async function updateSensors() {
+        if (dashboardView !== 'monitoring') return;
+        
+        let data = currentNode === 1 ? await fetchThingSpeakData() : generateMockSensorData(currentNode);
+        if (currentNode === 2) updateConnectionStatusDisplay(false, null);
+        
+        sensorHistory.push({ timestamp: new Date(), node: currentNode, data: data });
+        if (sensorHistory.length > 500) sensorHistory.shift();
+        
+        // Primary sensors
+        const primarySensors = [
+            { icon: '🌡️', label: 'Temperature', value: data.temperature.toFixed(1), unit: '°C', status: getStatus(data.temperature, 26, 30) },
+            { icon: '💧', label: 'Humidity', value: data.humidity.toFixed(1), unit: '%', status: getStatus(data.humidity, 55, 65) },
+            { icon: '☀️', label: 'Light', value: Math.round(data.lightIntensity), unit: 'lux', status: getStatus(data.lightIntensity, 300, 200, true) },
+            { icon: '🔊', label: 'Noise', value: data.noise.current.toFixed(1), unit: 'dB', status: getStatus(data.noise.current, 70, 85), secondary: [{ label: 'Peak', value: data.noise.peak.toFixed(1) }, { label: 'Avg', value: data.noise.average.toFixed(1) }] }
+        ];
+        document.getElementById('primary-sensors').innerHTML = primarySensors.map(s => `
+            <div class="card">
+                <div class="card-header">
+                    <div class="sensor-icon">${s.icon}</div>
+                    <div class="status-indicator status-${s.status}"></div>
+                </div>
+                <p class="sensor-label">${s.label}</p>
+                <div class="sensor-value">
+                    <span class="value-large color-${s.status}">${s.value}</span>
+                    <span class="value-unit">${s.unit}</span>
+                </div>
+                ${s.secondary ? `<div class="secondary-values">${s.secondary.map(sec => `<div><label>${sec.label}</label><span>${sec.value} dB</span></div>`).join('')}</div>` : ''}
+            </div>
+        `).join('');
+        
+        document.getElementById('tvoc-sensors').innerHTML = renderTVOCCards(data.tvoc);
+        
+        // PM sensors
+        const pmSensors = [
+            { label: 'PM 2.5', value: data.particulate.pm25, warning: 25, critical: 30, unit: 'μg/m³' },
+            { label: 'PM 1', value: data.particulate.pm10, warning: 40, critical: 45, unit: 'μg/m³' }
+        ];
+        document.getElementById('pm-sensors').innerHTML = pmSensors.map(s => {
+            const status = getStatus(s.value, s.warning, s.critical);
+            return `<div class="card"><p class="sensor-label">${s.label}</p><div class="sensor-value"><span class="value-large color-${status}">${s.value.toFixed(1)}</span><span class="value-unit">${s.unit}</span></div><div class="status-indicator status-${status}" style="margin-top:8px"></div></div>`;
+        }).join('');
+        
+        // Update charts
+        const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        if (climateChart.data.labels.length >= 20) {
+            climateChart.data.labels.shift();
+            climateChart.data.datasets[0].data.shift();
+            climateChart.data.datasets[1].data.shift();
+            airChart.data.labels.shift();
+            airChart.data.datasets[0].data.shift();
         }
-
-        // Start audio recording
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-                // Determine supported MIME type
-                let mimeType = 'audio/webm';
-                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-                    mimeType = 'audio/webm;codecs=opus';
-                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                    mimeType = 'audio/mp4';
-                } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
-                    mimeType = 'audio/ogg;codecs=opus';
-                }
-
-                mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
-                audioChunks = [];
-
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        audioChunks.push(event.data);
-                    }
-                };
-
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: mimeType });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-
-                    // Create download link
-                    const link = document.createElement('a');
-                    link.href = audioUrl;
-
-                    // Determine file extension
-                    let extension = 'webm';
-                    if (mimeType.includes('mp4')) extension = 'mp4';
-                    else if (mimeType.includes('ogg')) extension = 'ogg';
-
-                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-                    link.download = `audio-recording-node${currentNode}-${timestamp}.${extension}`;
-                    link.style.display = 'none';
-
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-
-                    // Clean up
-                    URL.revokeObjectURL(audioUrl);
-                    stream.getTracks().forEach(track => track.stop());
-                };
-
-                mediaRecorder.start();
-                isRecording = true;
-
-                // Update UI
-                const recordBtn = document.getElementById('recordBtn');
-                recordBtn.classList.add('recording');
-                document.getElementById('recordIcon').textContent = '⏹️';
-                document.getElementById('recordText').textContent = 'Stop Recording';
-
-            } catch (error) {
-                console.error('Error accessing microphone:', error);
-                alert('Unable to access microphone. Please grant microphone permissions and try again.');
-            }
-        }
-
-        // Stop audio recording
-        function stopRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-
-                // Update UI
-                const recordBtn = document.getElementById('recordBtn');
-                recordBtn.classList.remove('recording');
-                document.getElementById('recordIcon').textContent = '🎤';
-                document.getElementById('recordText').textContent = 'Record Audio';
-            }
-        }
-
-        // Download CSV
-        function downloadCSV() {
-            const timeRange = document.getElementById('timeRange').value;
-            const now = new Date();
-            let filteredData = [];
-            let timeLabel = '';
-
-            // Calculate start and end dates based on time range
-            let startDate, endDate;
-
-            switch (timeRange) {
-                case 'all':
-                    filteredData = sensorHistory.filter(record => record.node === currentNode);
-                    timeLabel = 'all-time';
-                    break;
-
-                case 'daily':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-                    timeLabel = 'daily';
-                    break;
-
-                case 'weekly':
-                    const dayOfWeek = now.getDay();
-                    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-                    startDate = new Date(now.getTime() - daysToMonday * 24 * 60 * 60 * 1000);
-                    startDate.setHours(0, 0, 0, 0);
-                    endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
-                    endDate.setHours(23, 59, 59, 999);
-                    timeLabel = 'weekly';
-                    break;
-
-                case 'monthly':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
-                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-                    timeLabel = 'monthly';
-                    break;
-
-                case 'yearly':
-                    startDate = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
-                    endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
-                    timeLabel = 'yearly';
-                    break;
-
-                case 'custom':
-                    const startInput = document.getElementById('startDate').value;
-                    const endInput = document.getElementById('endDate').value;
-
-                    if (!startInput || !endInput) {
-                        alert('Please select both start and end dates for custom range.');
-                        return;
-                    }
-
-                    startDate = new Date(startInput);
-                    startDate.setHours(0, 0, 0, 0);
-                    endDate = new Date(endInput);
-                    endDate.setHours(23, 59, 59, 999);
-                    timeLabel = `${startInput}_to_${endInput}`;
-                    break;
-            }
-
-            // Filter data for non-all ranges
-            if (timeRange !== 'all') {
-                filteredData = sensorHistory.filter(record =>
-                    record.node === currentNode &&
-                    record.timestamp >= startDate &&
-                    record.timestamp <= endDate
-                );
-            }
-
-            if (filteredData.length === 0) {
-                alert('No data available for the selected time range. Please wait for data to be collected.');
-                return;
-            }
-
-            // Create CSV content
-            let csvContent = "Timestamp,Node,Sensor,Value,Unit,Status\n";
-
-            // Process each record in history
-            filteredData.forEach(record => {
-                const timestamp = record.timestamp.toISOString();
-                const data = record.data;
-
-                // Add primary sensors
-                const rows = [
-                    ['Temperature', data.temperature.toFixed(1), '°C', getStatus(data.temperature, 26, 30)],
-                    ['Humidity', data.humidity.toFixed(1), '%', getStatus(data.humidity, 55, 65)],
-                    ['Light Intensity', Math.round(data.lightIntensity), 'lux', getStatus(data.lightIntensity, 300, 200, true)],
-                    ['Noise Current', data.noise.current.toFixed(1), 'dB', getStatus(data.noise.current, 70, 85)],
-                    ['Noise Peak', data.noise.peak.toFixed(1), 'dB', '-'],
-                    ['Noise Average', data.noise.average.toFixed(1), 'dB', '-'],
-                    ['NH3', data.tvoc.nh3.toFixed(1), 'ppb', getStatus(data.tvoc.nh3, 35, 45)],
-                    ['NO2', data.tvoc.no2.toFixed(1), 'ppb', getStatus(data.tvoc.no2, 20, 25)],
-                    ['H2S', data.tvoc.h2s.toFixed(1), 'ppb', getStatus(data.tvoc.h2s, 15, 18)],
-                    ['CO', data.tvoc.co.toFixed(1), 'ppm', getStatus(data.tvoc.co, 70, 90)],
-                    ['PM 2.5', data.particulate.pm25.toFixed(1), 'μg/m³', getStatus(data.particulate.pm25, 25, 30)],
-                    ['PM 10', data.particulate.pm10.toFixed(1), 'μg/m³', getStatus(data.particulate.pm10, 40, 45)]
-                ];
-
-                rows.forEach(([sensor, value, unit, status]) => {
-                    csvContent += `${timestamp},Node ${record.node},${sensor},${value},${unit},${status}\n`;
-                });
-            });
-
-            // Create download link
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-
-            const dateStr = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `sensor-data-node${currentNode}-${timeLabel}-${dateStr}.csv`);
-            link.style.visibility = 'hidden';
-
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // —— Production Data: relational schema (browser localStorage demo) ——
-        const PD_STORAGE_KEY = 'productiondata_schema_v2';
-        const PD_ROLE_ORDER = { staff: 0, manager: 1, owner: 2 };
-
-        const pdState = {
-            role: 'owner',
-            farmId: null,
-            batchFilter: '',
-            activePanel: 'overview',
-            wired: false
-        };
-
-        function pdGenId() {
-            return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 11);
-        }
-
-        function pdLoadDb() {
-            try {
-                const raw = localStorage.getItem(PD_STORAGE_KEY);
-                if (raw) {
-                    const db = JSON.parse(raw);
-                    if (db && Array.isArray(db.farms)) return db;
-                }
-            } catch (e) { console.warn(e); }
-            const db = {
-                farms: [],
-                profiles: [],
-                batches: [],
-                daily_records: [],
-                weight_records: [],
-                inventory: [],
-                sales: [],
-                costs: []
-            };
-            const ownerId = pdGenId();
-            const farmId = pdGenId();
-            db.farms.push({ id: farmId, name: 'Main Farm', owner_id: ownerId });
-            db.profiles.push({ id: pdGenId(), farm_id: farmId, full_name: 'Demo Owner', role: 'owner' });
-            pdSaveDb(db);
-            return db;
-        }
-
-        function pdSaveDb(db) {
-            localStorage.setItem(PD_STORAGE_KEY, JSON.stringify(db));
-        }
-
-        function pdEsc(s) {
-            const d = document.createElement('div');
-            d.textContent = s == null ? '' : String(s);
-            return d.innerHTML;
-        }
-
-        function pdRoleAtLeast(minRole) {
-            return PD_ROLE_ORDER[pdState.role] >= PD_ROLE_ORDER[minRole];
-        }
-
-        function pdCurrentFarmId() {
-            const db = pdLoadDb();
-            return pdState.farmId || db.farms[0]?.id || null;
-        }
-
-        function pdBatchesForFarm(farmId) {
-            if (!farmId) return [];
-            return pdLoadDb().batches.filter((b) => b.farm_id === farmId);
-        }
-
-        function pdBatchLabel(batchId) {
-            const b = pdLoadDb().batches.find((x) => x.id === batchId);
-            return b ? b.name : String(batchId).slice(0, 10);
-        }
-
-        function pdFarmLabel(farmId) {
-            const f = pdLoadDb().farms.find((x) => x.id === farmId);
-            return f ? f.name : farmId;
-        }
-
-        function pdBatchIdSet() {
-            const farmId = pdCurrentFarmId();
-            const ids = new Set(pdBatchesForFarm(farmId).map((b) => b.id));
-            if (pdState.batchFilter) {
-                const one = new Set();
-                if (ids.has(pdState.batchFilter)) one.add(pdState.batchFilter);
-                return one;
-            }
-            return ids;
-        }
-
-        function pdFilterRows(rows) {
-            const ids = pdBatchIdSet();
-            return rows.filter((r) => ids.has(r.batch_id));
-        }
-
-        function pdToday() {
-            return new Date().toISOString().slice(0, 10);
-        }
-
-        function pdPopulateFarmSelect() {
-            const sel = document.getElementById('pd-farm-select');
-            if (!sel) return;
-            const db = pdLoadDb();
-            sel.innerHTML = '';
-            db.farms.forEach((f) => {
-                const o = document.createElement('option');
-                o.value = f.id;
-                o.textContent = f.name;
-                sel.appendChild(o);
-            });
-            if (pdState.farmId && db.farms.some((f) => f.id === pdState.farmId)) {
-                sel.value = pdState.farmId;
-            } else if (db.farms[0]) {
-                pdState.farmId = db.farms[0].id;
-                sel.value = pdState.farmId;
-            }
-        }
-
-        function pdPopulateBatchFilter() {
-            const sel = document.getElementById('pd-batch-filter');
-            if (!sel) return;
-            const cur = pdState.batchFilter;
-            sel.innerHTML = '<option value="">All batches</option>';
-            pdBatchesForFarm(pdCurrentFarmId()).forEach((b) => {
-                const o = document.createElement('option');
-                o.value = b.id;
-                o.textContent = b.name;
-                sel.appendChild(o);
-            });
-            if (cur && [...sel.options].some((o) => o.value === cur)) sel.value = cur;
-            else pdState.batchFilter = '';
-        }
-
-        function pdFillBatchSelects() {
-            const farmId = pdCurrentFarmId();
-            const batches = pdBatchesForFarm(farmId);
-            const html = batches.map((b) => `<option value="${pdEsc(b.id)}">${pdEsc(b.name)}</option>`).join('');
-            ['pd-daily-batch', 'pd-weight-batch', 'pd-inv-batch', 'pd-sales-batch', 'pd-costs-batch'].forEach((id) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                const v = el.value;
-                el.innerHTML = html || '<option value="">— Add a batch first —</option>';
-                if (v && [...el.options].some((o) => o.value === v)) el.value = v;
-            });
-            const pf = document.getElementById('pd-profile-farm');
-            if (pf) {
-                pf.innerHTML = pdLoadDb().farms.map((f) => `<option value="${pdEsc(f.id)}">${pdEsc(f.name)}</option>`).join('');
-            }
-        }
-
-        function pdBuildSubtabs() {
-            const host = document.getElementById('pd-subtabs');
-            if (!host) return;
-            const tabs = [
-                { id: 'overview', label: 'Overview', min: 'staff' },
-                { id: 'batches', label: 'Batches', min: 'manager' },
-                { id: 'daily', label: 'Daily records', min: 'staff' },
-                { id: 'weights', label: 'Weight records', min: 'staff' },
-                { id: 'inventory', label: 'Inventory', min: 'manager' },
-                { id: 'sales', label: 'Sales', min: 'manager' },
-                { id: 'costs', label: 'Costs', min: 'manager' },
-                { id: 'admin', label: 'Farms & team', min: 'owner' }
-            ];
-            host.innerHTML = '';
-            tabs.forEach((t) => {
-                if (!pdRoleAtLeast(t.min)) return;
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'prod-subtab' + (t.id === pdState.activePanel ? ' active' : '');
-                btn.textContent = t.label;
-                btn.dataset.panel = t.id;
-                btn.addEventListener('click', () => pdSwitchPanel(t.id));
-                host.appendChild(btn);
-            });
-        }
-
-        function pdEnsureValidPanel() {
-            const allowed = [];
-            if (pdRoleAtLeast('staff')) allowed.push('overview', 'daily', 'weights');
-            if (pdRoleAtLeast('manager')) allowed.push('batches', 'inventory', 'sales', 'costs');
-            if (pdRoleAtLeast('owner')) allowed.push('admin');
-            if (!allowed.includes(pdState.activePanel)) pdState.activePanel = 'overview';
-        }
-
-        function pdSwitchPanel(id) {
-            pdState.activePanel = id;
-            document.querySelectorAll('.prod-subtab').forEach((b) => {
-                b.classList.toggle('active', b.dataset.panel === id);
-            });
-            document.querySelectorAll('#view-production .prod-panel').forEach((p) => p.classList.add('hidden'));
-            const panel = document.getElementById('pd-panel-' + id);
-            if (panel) panel.classList.remove('hidden');
-            pdFillBatchSelects();
-            const fd = document.querySelector('#pd-form-daily input[name="date"]');
-            if (fd) fd.value = pdToday();
-            const fw = document.querySelector('#pd-form-weight input[name="date"]');
-            if (fw) fw.value = pdToday();
-            const fb = document.querySelector('#pd-form-batch input[name="start_date"]');
-            if (fb && !fb.value) fb.value = pdToday();
-            pdRenderPanel(id);
-        }
-
-        function pdRenderPanel(id) {
-            switch (id) {
-                case 'overview': pdRenderOverview(); break;
-                case 'batches': pdRenderBatches(); break;
-                case 'daily': pdRenderDaily(); break;
-                case 'weights': pdRenderWeights(); break;
-                case 'inventory': pdRenderInventory(); break;
-                case 'sales': pdRenderSales(); break;
-                case 'costs': pdRenderCosts(); break;
-                case 'admin': pdRenderAdmin(); break;
-            }
-        }
-
-        function pdRenderOverview() {
-            const db = pdLoadDb();
-            const farmId = pdCurrentFarmId();
-            const batches = db.batches.filter((b) => b.farm_id === farmId);
-            const idSet = pdBatchIdSet();
-            const daily = pdFilterRows(db.daily_records);
-            const mort = daily.reduce((s, r) => s + (Number(r.mortality) || 0), 0);
-            const activeBatches = batches.filter((b) => idSet.has(b.id) && b.status === 'active').length;
-
-            const kpis = document.getElementById('pd-overview-kpis');
-            let html = `
-                <div class="prod-kpi"><div class="pk-label">Active batches (scope)</div><div class="pk-val">${activeBatches}</div></div>
-                <div class="prod-kpi"><div class="pk-label">Σ Mortality (daily)</div><div class="pk-val">${mort}</div></div>`;
-            if (pdRoleAtLeast('manager')) {
-                const inv = pdFilterRows(db.inventory).reduce((s, r) => s + (Number(r.total_cost) || 0), 0);
-                const sal = pdFilterRows(db.sales).reduce((s, r) => s + (Number(r.total_revenue) || 0), 0);
-                const cst = pdFilterRows(db.costs).reduce((s, r) => s + (Number(r.amount) || 0), 0);
-                html += `
-                <div class="prod-kpi"><div class="pk-label">Inventory spend</div><div class="pk-val">${inv.toFixed(0)}</div></div>
-                <div class="prod-kpi"><div class="pk-label">Sales revenue</div><div class="pk-val">${sal.toFixed(0)}</div></div>
-                <div class="prod-kpi"><div class="pk-label">Other costs</div><div class="pk-val">${cst.toFixed(0)}</div></div>`;
-            }
-            kpis.innerHTML = html;
-            document.getElementById('pd-overview-note').textContent = pdRoleAtLeast('manager')
-                ? 'Financial KPIs sum inventory.total_cost, sales.total_revenue, and costs.amount for the selected farm and batch filter.'
-                : 'Staff: operational counts only. Managers and owners see financial totals.';
-        }
-
-        function pdRenderBatches() {
-            const tbody = document.getElementById('pd-tbody-batches');
-            const farmId = pdCurrentFarmId();
-            let rows = pdLoadDb().batches.filter((b) => b.farm_id === farmId);
-            if (pdState.batchFilter) rows = rows.filter((b) => b.id === pdState.batchFilter);
-            tbody.innerHTML = rows.map((b) => `
-                <tr>
-                    <td>${pdEsc(b.name)}</td>
-                    <td>${pdEsc(b.strain || '—')}</td>
-                    <td>${pdEsc(b.initial_birds)}</td>
-                    <td>${pdEsc(b.start_date)}</td>
-                    <td>${pdEsc(b.status)}</td>
-                    <td style="font-size:11px;color:#64748b">${pdEsc(b.id)}</td>
-                    <td><button type="button" class="btn-farm pd-del-batch" data-id="${pdEsc(b.id)}">Delete</button></td>
-                </tr>`).join('');
-            tbody.querySelectorAll('.pd-del-batch').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    if (!confirm('Delete this batch and all linked daily/weight/inventory/sales/cost rows?')) return;
-                    pdDeleteBatch(btn.getAttribute('data-id'));
-                });
-            });
-        }
-
-        function pdDeleteBatch(batchId) {
-            let db = pdLoadDb();
-            db.batches = db.batches.filter((b) => b.id !== batchId);
-            db.daily_records = db.daily_records.filter((r) => r.batch_id !== batchId);
-            db.weight_records = db.weight_records.filter((r) => r.batch_id !== batchId);
-            db.inventory = db.inventory.filter((r) => r.batch_id !== batchId);
-            db.sales = db.sales.filter((r) => r.batch_id !== batchId);
-            db.costs = db.costs.filter((r) => r.batch_id !== batchId);
-            pdSaveDb(db);
-            pdPopulateBatchFilter();
-            pdFillBatchSelects();
-            pdRenderPanel(pdState.activePanel);
-        }
-
-        function pdRenderDaily() {
-            const tbody = document.getElementById('pd-tbody-daily');
-            let rows = pdFilterRows(pdLoadDb().daily_records).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-            tbody.innerHTML = rows.map((r) => `
-                <tr>
-                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
-                    <td>${pdEsc(r.date)}</td>
-                    <td>${pdEsc(r.mortality)}</td>
-                    <td>${pdEsc(r.feed_consumed)}</td>
-                    <td>${pdEsc(r.water_consumed)}</td>
-                    <td><button type="button" class="btn-farm pd-del-daily" data-id="${pdEsc(r.id)}">Delete</button></td>
-                </tr>`).join('');
-            tbody.querySelectorAll('.pd-del-daily').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-id');
-                    const db = pdLoadDb();
-                    db.daily_records = db.daily_records.filter((x) => x.id !== id);
-                    pdSaveDb(db);
-                    pdRenderDaily();
-                    if (pdState.activePanel === 'overview') pdRenderOverview();
-                });
-            });
-        }
-
-        function pdRenderWeights() {
-            const tbody = document.getElementById('pd-tbody-weights');
-            let rows = pdFilterRows(pdLoadDb().weight_records).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-            tbody.innerHTML = rows.map((r) => `
-                <tr>
-                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
-                    <td>${pdEsc(r.date)}</td>
-                    <td>${pdEsc(r.avg_weight)}</td>
-                    <td>${pdEsc(r.sample_size)}</td>
-                    <td><button type="button" class="btn-farm pd-del-w" data-id="${pdEsc(r.id)}">Delete</button></td>
-                </tr>`).join('');
-            tbody.querySelectorAll('.pd-del-w').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-id');
-                    const db = pdLoadDb();
-                    db.weight_records = db.weight_records.filter((x) => x.id !== id);
-                    pdSaveDb(db);
-                    pdRenderWeights();
-                });
-            });
-        }
-
-        function pdRenderInventory() {
-            const tbody = document.getElementById('pd-tbody-inventory');
-            const rows = pdFilterRows(pdLoadDb().inventory).slice().reverse();
-            tbody.innerHTML = rows.map((r) => `
-                <tr>
-                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
-                    <td>${pdEsc(r.type)}</td>
-                    <td>${pdEsc(r.brand)}</td>
-                    <td>${pdEsc(r.category)}</td>
-                    <td>${pdEsc(r.quantity)}</td>
-                    <td>${pdEsc(r.unit_cost)}</td>
-                    <td>${pdEsc(r.total_cost)}</td>
-                    <td><button type="button" class="btn-farm pd-del-i" data-id="${pdEsc(r.id)}">Delete</button></td>
-                </tr>`).join('');
-            tbody.querySelectorAll('.pd-del-i').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-id');
-                    const db = pdLoadDb();
-                    db.inventory = db.inventory.filter((x) => x.id !== id);
-                    pdSaveDb(db);
-                    pdRenderInventory();
-                    if (pdState.activePanel === 'overview') pdRenderOverview();
-                });
-            });
-        }
-
-        function pdRenderSales() {
-            const tbody = document.getElementById('pd-tbody-sales');
-            const rows = pdFilterRows(pdLoadDb().sales).slice().reverse();
-            tbody.innerHTML = rows.map((r) => `
-                <tr>
-                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
-                    <td>${pdEsc(r.type)}</td>
-                    <td>${pdEsc(r.quantity)}</td>
-                    <td>${pdEsc(r.unit_price)}</td>
-                    <td>${pdEsc(r.total_revenue)}</td>
-                    <td>${pdEsc(r.buyer)}</td>
-                    <td><button type="button" class="btn-farm pd-del-s" data-id="${pdEsc(r.id)}">Delete</button></td>
-                </tr>`).join('');
-            tbody.querySelectorAll('.pd-del-s').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-id');
-                    const db = pdLoadDb();
-                    db.sales = db.sales.filter((x) => x.id !== id);
-                    pdSaveDb(db);
-                    pdRenderSales();
-                    if (pdState.activePanel === 'overview') pdRenderOverview();
-                });
-            });
-        }
-
-        function pdRenderCosts() {
-            const tbody = document.getElementById('pd-tbody-costs');
-            const rows = pdFilterRows(pdLoadDb().costs).slice().reverse();
-            tbody.innerHTML = rows.map((r) => `
-                <tr>
-                    <td>${pdEsc(pdBatchLabel(r.batch_id))}</td>
-                    <td>${pdEsc(r.category)}</td>
-                    <td>${pdEsc(r.description)}</td>
-                    <td>${pdEsc(r.amount)}</td>
-                    <td><button type="button" class="btn-farm pd-del-c" data-id="${pdEsc(r.id)}">Delete</button></td>
-                </tr>`).join('');
-            tbody.querySelectorAll('.pd-del-c').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-id');
-                    const db = pdLoadDb();
-                    db.costs = db.costs.filter((x) => x.id !== id);
-                    pdSaveDb(db);
-                    pdRenderCosts();
-                    if (pdState.activePanel === 'overview') pdRenderOverview();
-                });
-            });
-        }
-
-        function pdRenderAdmin() {
-            const db = pdLoadDb();
-            document.getElementById('pd-tbody-farms').innerHTML = db.farms.map((f) => `
-                <tr>
-                    <td>${pdEsc(f.name)}</td>
-                    <td style="font-size:12px">${pdEsc(f.owner_id)}</td>
-                    <td style="font-size:11px;color:#64748b">${pdEsc(f.id)}</td>
-                    <td><button type="button" class="btn-farm pd-del-farm" data-id="${pdEsc(f.id)}">Delete</button></td>
-                </tr>`).join('');
-            document.getElementById('pd-tbody-farms').querySelectorAll('.pd-del-farm').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-id');
-                    if (pdLoadDb().farms.length <= 1) { alert('Keep at least one farm.'); return; }
-                    if (!confirm('Delete farm and ALL related data?')) return;
-                    let d = pdLoadDb();
-                    const bIds = d.batches.filter((b) => b.farm_id === id).map((b) => b.id);
-                    d.farms = d.farms.filter((f) => f.id !== id);
-                    d.profiles = d.profiles.filter((p) => p.farm_id !== id);
-                    d.batches = d.batches.filter((b) => b.farm_id !== id);
-                    d.daily_records = d.daily_records.filter((r) => !bIds.includes(r.batch_id));
-                    d.weight_records = d.weight_records.filter((r) => !bIds.includes(r.batch_id));
-                    d.inventory = d.inventory.filter((r) => !bIds.includes(r.batch_id));
-                    d.sales = d.sales.filter((r) => !bIds.includes(r.batch_id));
-                    d.costs = d.costs.filter((r) => !bIds.includes(r.batch_id));
-                    pdSaveDb(d);
-                    pdState.farmId = pdLoadDb().farms[0]?.id || null;
-                    pdRefreshChrome();
-                });
-            });
-
-            document.getElementById('pd-tbody-profiles').innerHTML = db.profiles.map((p) => `
-                <tr>
-                    <td>${pdEsc(pdFarmLabel(p.farm_id))}</td>
-                    <td>${pdEsc(p.full_name)}</td>
-                    <td>${pdEsc(p.role)}</td>
-                    <td style="font-size:11px;color:#64748b">${pdEsc(p.id)}</td>
-                    <td><button type="button" class="btn-farm pd-del-prof" data-id="${pdEsc(p.id)}">Delete</button></td>
-                </tr>`).join('');
-            document.getElementById('pd-tbody-profiles').querySelectorAll('.pd-del-prof').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-id');
-                    const d = pdLoadDb();
-                    d.profiles = d.profiles.filter((p) => p.id !== id);
-                    pdSaveDb(d);
-                    pdRenderAdmin();
-                });
-            });
-        }
-
-        function pdRefreshChrome() {
-            pdPopulateFarmSelect();
-            pdPopulateBatchFilter();
-            pdFillBatchSelects();
-            pdBuildSubtabs();
-            pdEnsureValidPanel();
-            pdSwitchPanel(pdState.activePanel);
-            const badge = document.getElementById('pd-role-badge');
-            if (badge) badge.textContent = pdState.role.charAt(0).toUpperCase() + pdState.role.slice(1);
-        }
-
-        function pdWireOnce() {
-            if (pdState.wired) return;
-            pdState.wired = true;
-
-            document.getElementById('pd-farm-select')?.addEventListener('change', (e) => {
-                pdState.farmId = e.target.value;
-                localStorage.setItem('pd_demo_farm', pdState.farmId);
-                pdPopulateBatchFilter();
-                pdRefreshChrome();
-            });
-
-            document.getElementById('pd-role-select')?.addEventListener('change', (e) => {
-                pdState.role = e.target.value;
-                localStorage.setItem('pd_demo_role', pdState.role);
-                pdEnsureValidPanel();
-                pdRefreshChrome();
-            });
-
-            document.getElementById('pd-batch-filter')?.addEventListener('change', (e) => {
-                pdState.batchFilter = e.target.value;
-                pdRefreshChrome();
-            });
-
-            document.getElementById('pd-form-batch')?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!pdRoleAtLeast('manager')) return;
-                const farmId = pdCurrentFarmId();
-                if (!farmId) return;
-                const fd = new FormData(e.target);
-                const db = pdLoadDb();
-                db.batches.push({
-                    id: pdGenId(),
-                    farm_id: farmId,
-                    name: String(fd.get('name') || '').trim(),
-                    strain: String(fd.get('strain') || '').trim(),
-                    initial_birds: parseInt(fd.get('initial_birds'), 10) || 0,
-                    start_date: String(fd.get('start_date') || ''),
-                    status: String(fd.get('status') || 'active')
-                });
-                pdSaveDb(db);
-                e.target.reset();
-                const sd = e.target.querySelector('[name="start_date"]');
-                if (sd) sd.value = pdToday();
-                pdRefreshChrome();
-            });
-
-            document.getElementById('pd-form-daily')?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const fd = new FormData(e.target);
-                const batchId = String(fd.get('batch_id') || '');
-                if (!batchId) { alert('Select a batch.'); return; }
-                const db = pdLoadDb();
-                db.daily_records.push({
-                    id: pdGenId(),
-                    batch_id: batchId,
-                    date: String(fd.get('date') || ''),
-                    mortality: parseFloat(fd.get('mortality')) || 0,
-                    feed_consumed: parseFloat(fd.get('feed_consumed')) || 0,
-                    water_consumed: parseFloat(fd.get('water_consumed')) || 0
-                });
-                pdSaveDb(db);
-                e.target.querySelector('[name="date"]').value = pdToday();
-                pdRenderDaily();
-                if (pdState.activePanel === 'overview') pdRenderOverview();
-            });
-
-            document.getElementById('pd-form-weight')?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const fd = new FormData(e.target);
-                const batchId = String(fd.get('batch_id') || '');
-                if (!batchId) { alert('Select a batch.'); return; }
-                const db = pdLoadDb();
-                db.weight_records.push({
-                    id: pdGenId(),
-                    batch_id: batchId,
-                    date: String(fd.get('date') || ''),
-                    avg_weight: parseFloat(fd.get('avg_weight')) || 0,
-                    sample_size: parseInt(fd.get('sample_size'), 10) || 0
-                });
-                pdSaveDb(db);
-                e.target.querySelector('[name="date"]').value = pdToday();
-                pdRenderWeights();
-            });
-
-            document.getElementById('pd-form-inventory')?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!pdRoleAtLeast('manager')) return;
-                const fd = new FormData(e.target);
-                const batchId = String(fd.get('batch_id') || '');
-                if (!batchId) return;
-                const db = pdLoadDb();
-                db.inventory.push({
-                    id: pdGenId(),
-                    batch_id: batchId,
-                    type: String(fd.get('type') || ''),
-                    brand: String(fd.get('brand') || ''),
-                    category: String(fd.get('category') || ''),
-                    quantity: parseFloat(fd.get('quantity')) || 0,
-                    unit_cost: parseFloat(fd.get('unit_cost')) || 0,
-                    total_cost: parseFloat(fd.get('total_cost')) || 0
-                });
-                pdSaveDb(db);
-                e.target.reset();
-                pdRenderInventory();
-                if (pdState.activePanel === 'overview') pdRenderOverview();
-            });
-
-            document.getElementById('pd-form-sales')?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!pdRoleAtLeast('manager')) return;
-                const fd = new FormData(e.target);
-                const batchId = String(fd.get('batch_id') || '');
-                if (!batchId) return;
-                const db = pdLoadDb();
-                db.sales.push({
-                    id: pdGenId(),
-                    batch_id: batchId,
-                    type: String(fd.get('type') || ''),
-                    quantity: parseFloat(fd.get('quantity')) || 0,
-                    unit_price: parseFloat(fd.get('unit_price')) || 0,
-                    total_revenue: parseFloat(fd.get('total_revenue')) || 0,
-                    buyer: String(fd.get('buyer') || '')
-                });
-                pdSaveDb(db);
-                e.target.reset();
-                pdRenderSales();
-                if (pdState.activePanel === 'overview') pdRenderOverview();
-            });
-
-            document.getElementById('pd-form-costs')?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!pdRoleAtLeast('manager')) return;
-                const fd = new FormData(e.target);
-                const batchId = String(fd.get('batch_id') || '');
-                if (!batchId) return;
-                const db = pdLoadDb();
-                db.costs.push({
-                    id: pdGenId(),
-                    batch_id: batchId,
-                    category: String(fd.get('category') || ''),
-                    description: String(fd.get('description') || ''),
-                    amount: parseFloat(fd.get('amount')) || 0
-                });
-                pdSaveDb(db);
-                e.target.reset();
-                pdRenderCosts();
-                if (pdState.activePanel === 'overview') pdRenderOverview();
-            });
-
-            document.getElementById('pd-form-farm')?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!pdRoleAtLeast('owner')) return;
-                const fd = new FormData(e.target);
-                const db = pdLoadDb();
-                const oid = String(fd.get('owner_id') || '').trim() || pdGenId();
-                db.farms.push({
-                    id: pdGenId(),
-                    name: String(fd.get('name') || '').trim(),
-                    owner_id: oid
-                });
-                pdSaveDb(db);
-                e.target.reset();
-                pdRefreshChrome();
-            });
-
-            document.getElementById('pd-form-profile')?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!pdRoleAtLeast('owner')) return;
-                const fd = new FormData(e.target);
-                const db = pdLoadDb();
-                db.profiles.push({
-                    id: pdGenId(),
-                    farm_id: String(fd.get('farm_id') || ''),
-                    full_name: String(fd.get('full_name') || '').trim(),
-                    role: String(fd.get('role') || 'staff')
-                });
-                pdSaveDb(db);
-                e.target.reset();
-                pdRenderAdmin();
-            });
-
-            document.getElementById('pd-export-json')?.addEventListener('click', () => {
-                const blob = new Blob([JSON.stringify(pdLoadDb(), null, 2)], { type: 'application/json' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = `production_data_backup_${pdToday()}.json`;
-                a.click();
-                URL.revokeObjectURL(a.href);
-            });
-
-            document.getElementById('pd-import-json')?.addEventListener('click', () => {
-                document.getElementById('pd-import-json-file')?.click();
-            });
-
-            document.getElementById('pd-import-json-file')?.addEventListener('change', (ev) => {
-                const file = ev.target.files && ev.target.files[0];
-                ev.target.value = '';
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    try {
-                        const raw = JSON.parse(String(reader.result || ''));
-                        const data = {
-                            farms: Array.isArray(raw.farms) ? raw.farms : [],
-                            profiles: Array.isArray(raw.profiles) ? raw.profiles : [],
-                            batches: Array.isArray(raw.batches) ? raw.batches : [],
-                            daily_records: Array.isArray(raw.daily_records) ? raw.daily_records : [],
-                            weight_records: Array.isArray(raw.weight_records) ? raw.weight_records : [],
-                            inventory: Array.isArray(raw.inventory) ? raw.inventory : [],
-                            sales: Array.isArray(raw.sales) ? raw.sales : [],
-                            costs: Array.isArray(raw.costs) ? raw.costs : []
-                        };
-                        if (!data.farms.length) throw new Error('Backup must include at least one farm');
-                        pdSaveDb(data);
-                        pdState.farmId = data.farms[0]?.id || null;
-                        pdRefreshChrome();
-                        alert('Import complete.');
-                    } catch (err) {
-                        alert('Import failed: ' + (err.message || err));
-                    }
-                };
-                reader.readAsText(file);
-            });
-        }
-
-        function pdOnShowProductionTab() {
-            pdWireOnce();
-            const r = localStorage.getItem('pd_demo_role');
-            if (r === 'owner' || r === 'manager' || r === 'staff') pdState.role = r;
-            const f = localStorage.getItem('pd_demo_farm');
-            if (f && pdLoadDb().farms.some((x) => x.id === f)) pdState.farmId = f;
-            document.getElementById('pd-role-select').value = pdState.role;
-            pdRefreshChrome();
-        }
-
-        // Initialize
-        initCharts();
-        updateInfoBanner(false); // Start with offline status
+        climateChart.data.labels.push(timeLabel);
+        climateChart.data.datasets[0].data.push(data.temperature);
+        climateChart.data.datasets[1].data.push(data.humidity);
+        climateChart.update('none');
+        airChart.data.labels.push(timeLabel);
+        airChart.data.datasets[0].data.push(data.particulate.pm25);
+        airChart.update('none');
+        
+        updateTimestamp();
+    }
+
+    function addEvent() {
+        if (Math.random() > 0.3) return;
+        const templates = [
+            { icon: 'ℹ️', color: '#3b82f6', sensor: 'Temperature', message: 'Reading normalized' },
+            { icon: '✓', color: '#22c55e', sensor: 'Humidity', message: 'Optimal range' },
+            { icon: '⚠️', color: '#f59e0b', sensor: 'PM 2.5', message: 'Elevated particulate detected' },
+            { icon: '✕', color: '#ef4444', sensor: 'CO', message: 'Elevated carbon monoxide' },
+            { icon: '⚠️', color: '#f59e0b', sensor: 'NH₃', message: 'NH₃ levels in caution zone (11-25ppm)' },
+            { icon: '✕', color: '#ef4444', sensor: 'NH₃', message: 'NH₃ levels critical! (>25ppm)' }
+        ];
+        const template = templates[Math.floor(Math.random() * templates.length)];
+        events.unshift({ ...template, message: `[Node ${currentNode}] ${template.message}`, timestamp: new Date() });
+        events = events.slice(0, 50);
+        document.getElementById('event-count').textContent = events.length;
+        document.getElementById('event-log').innerHTML = events.map(e => `
+            <div class="event-item">
+                <div style="color:${e.color}">${e.icon}</div>
+                <div>
+                    <div>${e.message} • ${e.sensor}</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:2px;">${e.timestamp.toLocaleTimeString()}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function switchNode(nodeId) {
+        currentNO2Value = 0.005;
+        
+        showMonitoringView();
+        currentNode = nodeId;
+        document.querySelectorAll('.tab-node').forEach((tab, i) => tab.classList.toggle('active', i === nodeId - 1));
+        
+        climateChart.data.labels = [];
+        climateChart.data.datasets[0].data = [];
+        climateChart.data.datasets[1].data = [];
+        airChart.data.labels = [];
+        airChart.data.datasets[0].data = [];
+        climateChart.update('none');
+        airChart.update('none');
+        
+        events = [];
+        document.getElementById('event-log').innerHTML = '';
+        document.getElementById('event-count').textContent = '0';
+        
+        if (nodeId === 1) updateConnectionStatusDisplay(isNode1Online, lastDataTimestamp);
+        else updateConnectionStatusDisplay(false, null);
+        
         updateSensors();
         updateTimestamp();
+    }
 
-        // Update intervals
-        setInterval(updateSensors, 2000);
-        setInterval(addEvent, 5000);
-        setInterval(updateTimestamp, 1000);
-    </script>
+    function showMonitoringView() {
+        dashboardView = 'monitoring';
+        document.getElementById('view-monitoring').classList.remove('hidden');
+        document.getElementById('view-production').classList.add('hidden');
+        document.getElementById('monitoring-toolbar').classList.remove('hidden');
+        document.getElementById('production-toolbar-hint').classList.add('hidden');
+        document.querySelectorAll('.tab-node').forEach(t => t.classList.remove('active'));
+        document.querySelector('.tab-production')?.classList.remove('active');
+        const activeTab = currentNode === 1 ? document.querySelector('.tab-node:first-child') : document.querySelector('.tab-node:last-child');
+        if (activeTab) activeTab.classList.add('active');
+    }
+
+    // Initial setup
+    initCharts();
+    updateSensors();
+    setInterval(() => {
+        if (dashboardView === 'monitoring') updateSensors();
+    }, 15000);
+    setInterval(addEvent, 5000);
+</script>
 </body>
 </html>
