@@ -654,6 +654,137 @@
         if (activeTab) activeTab.classList.add('active');
     }
 
+    function switchToFarmRecords() {
+        dashboardView = 'production';
+        document.getElementById('view-monitoring').classList.add('hidden');
+        document.getElementById('view-production').classList.remove('hidden');
+        document.getElementById('monitoring-toolbar').classList.add('hidden');
+        document.getElementById('production-toolbar-hint').classList.remove('hidden');
+        document.querySelectorAll('.tab-node').forEach(t => t.classList.remove('active'));
+        document.querySelector('.tab-production').classList.add('active');
+        
+        if (!document.getElementById('poultryProRoot').innerHTML) {
+            document.getElementById('poultryProRoot').innerHTML = `
+                <div class="prod-container">
+                    <div class="poultry-nav">
+                        <div class="poultry-nav-item active" onclick="switchProductionTab('overview')">
+                            <i class="fas fa-chart-line"></i> Overview
+                        </div>
+                        <div class="poultry-nav-item" onclick="switchProductionTab('flocks')">
+                            <i class="fas fa-dove"></i> Flocks
+                        </div>
+                        <div class="poultry-nav-item" onclick="switchProductionTab('feed')">
+                            <i class="fas fa-seedling"></i> Feed Management
+                        </div>
+                        <div class="poultry-nav-item" onclick="switchProductionTab('health')">
+                            <i class="fas fa-heartbeat"></i> Health Monitoring
+                        </div>
+                        <div class="poultry-nav-item" onclick="switchProductionTab('reports')">
+                            <i class="fas fa-file-alt"></i> Reports
+                        </div>
+                    </div>
+                    <div id="production-content"></div>
+                </div>
+            `;
+            switchProductionTab('overview');
+        }
+    }
+
+    function switchProductionTab(tab) {
+        document.querySelectorAll('.poultry-nav-item').forEach(item => item.classList.remove('active'));
+        event.target.closest('.poultry-nav-item').classList.add('active');
+        const content = document.getElementById('production-content');
+        if (tab === 'overview') {
+            content.innerHTML = `
+                <div class="grid grid-4" style="margin-bottom: 24px;">
+                    <div class="kpi-card">
+                        <h4>Total Flocks</h4>
+                        <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">12</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Active Birds</h4>
+                        <div style="font-size: 32px; font-weight: 700; color: #22c55e;">45,230</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Egg Production</h4>
+                        <div style="font-size: 32px; font-weight: 700; color: #f59e0b;">8,450</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Feed Consumption</h4>
+                        <div style="font-size: 32px; font-weight: 700; color: #8b5cf6;">2.3 tons</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h4>Production Trends</h4>
+                    <canvas id="productionChart" style="height: 200px;"></canvas>
+                </div>
+            `;
+            const ctx = document.getElementById('productionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Eggs Produced',
+                        data: [7500, 7800, 8200, 8100, 8400, 8450],
+                        borderColor: '#3b82f6',
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: { x: { ticks: { color: '#64748b' } }, y: { ticks: { color: '#64748b' } } }
+                }
+            });
+        } else if (tab === 'flocks') {
+            content.innerHTML = `
+                <div style="margin-bottom: 16px;">
+                    <button class="btn-prod" onclick="openAddFlockModal()">+ Add New Flock</button>
+                </div>
+                <div class="prod-table-container">
+                    <table class="prod-table">
+                        <thead>
+                            <tr>
+                                <th>Flock ID</th>
+                                <th>Breed</th>
+                                <th>Age (weeks)</th>
+                                <th>Count</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>FLK-001</td>
+                                <td>Rhode Island Red</td>
+                                <td>8</td>
+                                <td>500</td>
+                                <td><span class="status-badge status-online">Active</span></td>
+                                <td><button class="btn-prod" style="padding: 4px 8px; font-size: 12px;">Edit</button></td>
+                            </tr>
+                            <tr>
+                                <td>FLK-002</td>
+                                <td>Leghorn</td>
+                                <td>12</td>
+                                <td>450</td>
+                                <td><span class="status-badge status-online">Active</span></td>
+                                <td><button class="btn-prod" style="padding: 4px 8px; font-size: 12px;">Edit</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } else {
+            content.innerHTML = `<div style="text-align: center; padding: 40px; color: #94a3b8;">${tab.charAt(0).toUpperCase() + tab.slice(1)} module coming soon...</div>`;
+        }
+    }
+
+    function openAddFlockModal() {
+        // Placeholder for modal
+        alert('Add Flock modal would open here.');
+    }
+
     // Initial setup
     initCharts();
     updateSensors();
